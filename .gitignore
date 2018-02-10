@@ -1,0 +1,8 @@
+#database files
+/db/
+
+#pycharm
+.idea
+app/foo/.idea/
+app/foo/foo/__pycache__/
+app/foo/helloworld/__pycache__/
