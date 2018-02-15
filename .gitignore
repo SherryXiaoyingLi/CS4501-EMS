@@ -7,5 +7,8 @@ app/tech_consult/.idea/
 app/tech_consult/tech_consult/__pycache__/
 app/tech_consult/webapp/__pycache__/
 
+#migrations
+app/tech_consult/webapp/migrations/
+
 #OS X
 app/.DS_Store
