@@ -12,3 +12,4 @@ app/tech_consult/webapp/migrations/
 
 #OS X
 app/.DS_Store
+.DS_Store
