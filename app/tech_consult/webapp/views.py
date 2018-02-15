@@ -6,6 +6,7 @@ from django.http import HttpResponse
 from django.http import JsonResponse
 from .models import Consumer, ConsumerRequest, Producer, Review
 from .forms import UpdateConsumerForm
+from django.views.decorators.csrf import csrf_exempt
 
 # Create your views here.
 
@@ -49,49 +50,60 @@ def get_consumer (request, consumer_pk):
 
     return JsonResponse(response)
 
+@csrf_exempt
 def create_consumer (request):
     response = {}
     response_data = {}
+    try:
+        if request.method == 'POST':
+            form = UpdateConsumerForm(request.POST)
 
-    if request.method == 'POST':
-        form = UpdateConsumerForm(request.POST)
+            if form.is_valid():
 
-        if form.is_valid():
+                response['ok'] = True
 
-            response['ok'] = True
+                # Creating the consumer based on form input
+                consumer = Consumer()
+                consumer.username = form.cleaned_data['username']
+                consumer.password = form.cleaned_data['password']
+                consumer.first_name = form.cleaned_data['first_name']
+                consumer.last_name = form.cleaned_data['last_name']
+                consumer.phone = form.cleaned_data['phone']
+                consumer.email = form.cleaned_data['email']
 
-            # Creating the consumer based on form input
-            consumer = Consumer()
-            consumer.username = form.cleaned_data['username']
-            consumer.password = form.cleaned_data['password']
-            consumer.first_name = form.cleaned_data['first_name']
-            consumer.last_name = form.cleaned_data['last_name']
-            consumer.phone = form.cleaned_data['phone']
-            consumer.email = form.cleaned_data['email']
+                consumer.save()
 
-            consumer.save()
+                # Adding the created consumer's data to json response
+                response_data['pk'] = consumer.pk
+                response_data['username'] = consumer.username
+                response_data['password'] = consumer.password
+                response_data['first_name'] = consumer.first_name
+                response_data['last_name'] = consumer.last_name
+                response_data['phone'] = consumer.phone
+                response_data['email'] = consumer.email
 
-            # Adding the created consumer's data to json response
-            response_data['pk'] = consumer.pk
-            response_data['username'] = consumer.username
-            response_data['password'] = consumer.password
-            response_data['first_name'] = consumer.first_name
-            response_data['last_name'] = consumer.last_name
-            response_data['phone'] = consumer.phone
-            response_data['email'] = consumer.email
+            else:
+                response['ok'] = False
+
+            response['result'] = response_data
+
+            return JsonResponse(response)
+
 
         else:
-            response['ok'] = False
+            # An unfilled form gets displayed
+            form = UpdateConsumerForm()
+            return render(request, 'update_consumer.html', {'form': form, 'update': False})
+    except:
+        response['ok'] = False
 
         response['result'] = response_data
 
-        return JsonResponse(response)
 
-    else:
-        # An unfilled form gets displayed
-        form = UpdateConsumerForm()
-        return render(request, 'update_consumer.html', {'form': form, 'update': False})
+    return JsonResponse(response)
 
+
+@csrf_exempt
 def update_consumer (request, consumer_pk):
     response = {}
     response_data = {}
@@ -133,41 +145,45 @@ def update_consumer (request, consumer_pk):
             return JsonResponse(response)
 
         # The form filled with the consumer's data
-        else:
-            form = UpdateConsumerForm(initial={'username':consumer.username, 'password': consumer.password, 'first_name': consumer.first_name, 'last_name': consumer.last_name, 'phone': consumer.phone, 'email': consumer.email})
-            return render(request, 'update_consumer.html', {'form': form, 'update': True})
+        #else:
+        #    form = UpdateConsumerForm(initial={'username':consumer.username, 'password': consumer.password, 'first_name': consumer.first_name, 'last_name': consumer.last_name, 'phone': consumer.phone, 'email': consumer.email})
+        #    return render(request, 'update_consumer.html', {'form': form, 'update': True})
 
-    except Consumer.DoesNotExist:
+    except:
         response['ok'] = False
 
         response['result'] = response_data
 
+
     return JsonResponse(response)
 
+#Does not yet work with Postman
+@csrf_exempt
 def delete_consumer (request, consumer_pk):
-    response = {}
-    response_data = {}
+    if request.method == 'POST':
+        response = {}
+        response_data = {}
 
-    try:
-        consumer = Consumer.objects.get(pk=consumer_pk)
+        try:
+            consumer = Consumer.objects.get(pk=consumer_pk)
 
-        response['ok'] = True
+            response['ok'] = True
 
-        # Adding the deleted consumer's data to json response
-        response_data['pk'] = consumer.pk
-        response_data['username'] = consumer.username
-        response_data['password'] = consumer.password
-        response_data['first_name'] = consumer.first_name
-        response_data['last_name'] = consumer.last_name
-        response_data['phone'] = consumer.phone
-        response_data['email'] = consumer.email
+            # Adding the deleted consumer's data to json response
+            response_data['pk'] = consumer.pk
+            response_data['username'] = consumer.username
+            response_data['password'] = consumer.password
+            response_data['first_name'] = consumer.first_name
+            response_data['last_name'] = consumer.last_name
+            response_data['phone'] = consumer.phone
+            response_data['email'] = consumer.email
 
-        consumer.delete()
+            consumer.delete()
 
-    except Consumer.DoesNotExist:
-        response['ok'] = False
+        except Consumer.DoesNotExist:
+            response['ok'] = False
 
-    response['result'] = response_data
+        response['result'] = response_data
 
     return JsonResponse(response)
 
