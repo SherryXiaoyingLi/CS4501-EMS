@@ -1,0 +1,9 @@
+models:
+    image: tp33/django
+    external_links:
+      -  project_mysql:db
+    volumes:
+      - ./:/app
+    ports:
+      - "8001:8000"
+    command: bash -c "mod_wsgi-express start-server --working-directory /app/tech_consult --reload-on-changes /app/tech_consult/tech_consult/wsgi.py"
