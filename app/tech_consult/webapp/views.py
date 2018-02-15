@@ -11,19 +11,9 @@ from .forms import UpdateConsumerForm
 
 def index(request):
 
-    # Creates a test consumer
-    #test = Consumer()
-    #test.username = 'mylee3'
-    #test.password = 'ilikeseals'
-    #test.first_name = 'marissa'
-    #test.last_name = 'lee'
-    #test.phone = '7037316926'
-    #test.email = 'myl2vu@virginia.edu'
-
-    #test.save()
-
     return HttpResponse("CS4501 Project 2")
 
+# json response code based on https://stackoverflow.com/questions/2428092/creating-a-json-response-using-django-and-python
 def get_consumer (request, consumer_pk):
     response = {}
     response_data = {}
@@ -70,6 +60,7 @@ def create_consumer (request):
 
             response['ok'] = True
 
+            # Creating the consumer based on form input
             consumer = Consumer()
             consumer.username = form.cleaned_data['username']
             consumer.password = form.cleaned_data['password']
@@ -80,6 +71,7 @@ def create_consumer (request):
 
             consumer.save()
 
+            # Adding the created consumer's data to json response
             response_data['pk'] = consumer.pk
             response_data['username'] = consumer.username
             response_data['password'] = consumer.password
@@ -96,6 +88,85 @@ def create_consumer (request):
         return JsonResponse(response)
 
     else:
+        # An unfilled form gets displayed
         form = UpdateConsumerForm()
-        return render(request, 'update_consumer.html', {'form': form})
+        return render(request, 'update_consumer.html', {'form': form, 'update': False})
 
+def update_consumer (request, consumer_pk):
+    response = {}
+    response_data = {}
+    try:
+        consumer = Consumer.objects.get(pk=consumer_pk)
+
+        # User submits the form's data
+        if request.method == 'POST':
+            form = UpdateConsumerForm(request.POST)
+
+            if form.is_valid():
+
+                response['ok'] = True
+
+                # Updating the consumer based on form input
+                consumer.username = form.cleaned_data['username']
+                consumer.password = form.cleaned_data['password']
+                consumer.first_name = form.cleaned_data['first_name']
+                consumer.last_name = form.cleaned_data['last_name']
+                consumer.phone = form.cleaned_data['phone']
+                consumer.email = form.cleaned_data['email']
+
+                consumer.save()
+
+                # Adding the updated consumer's data to json response
+                response_data['pk'] = consumer.pk
+                response_data['username'] = consumer.username
+                response_data['password'] = consumer.password
+                response_data['first_name'] = consumer.first_name
+                response_data['last_name'] = consumer.last_name
+                response_data['phone'] = consumer.phone
+                response_data['email'] = consumer.email
+
+            else:
+                response['ok'] = False
+
+            response['result'] = response_data
+
+            return JsonResponse(response)
+
+        # The form filled with the consumer's data
+        else:
+            form = UpdateConsumerForm(initial={'username':consumer.username, 'password': consumer.password, 'first_name': consumer.first_name, 'last_name': consumer.last_name, 'phone': consumer.phone, 'email': consumer.email})
+            return render(request, 'update_consumer.html', {'form': form, 'update': True})
+
+    except Consumer.DoesNotExist:
+        response['ok'] = False
+
+        response['result'] = response_data
+
+    return JsonResponse(response)
+
+def delete_consumer (request, consumer_pk):
+    response = {}
+    response_data = {}
+
+    try:
+        consumer = Consumer.objects.get(pk=consumer_pk)
+
+        response['ok'] = True
+
+        # Adding the deleted consumer's data to json response
+        response_data['pk'] = consumer.pk
+        response_data['username'] = consumer.username
+        response_data['password'] = consumer.password
+        response_data['first_name'] = consumer.first_name
+        response_data['last_name'] = consumer.last_name
+        response_data['phone'] = consumer.phone
+        response_data['email'] = consumer.email
+
+        consumer.delete()
+
+    except Consumer.DoesNotExist:
+        response['ok'] = False
+
+    response['result'] = response_data
+
+    return JsonResponse(response)
