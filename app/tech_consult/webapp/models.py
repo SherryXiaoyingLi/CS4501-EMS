@@ -10,7 +10,7 @@ class Consumer(models.Model):
     last_name = models.CharField(max_length=200, default="none")
     phone = models.CharField(max_length=200, default="none")
     email = models.EmailField(max_length=200, default="none")
-    user = models.ForeignKey(User)
+    #user = models.ForeignKey(User)
 
     def __str__(self):
         return "%s" % (self.username)
@@ -31,7 +31,7 @@ class Producer(models.Model):
     skills = models.CharField(max_length=200, default="none")
     review = models.ForeignKey(Review)
     #consumer = models.ForeignKey(Consumer)
-    user = models.ForeignKey(User)
+    #user = models.ForeignKey(User)
 
     def __str__(self):
         return "%s" % (self.username)

@@ -22,5 +22,6 @@ from webapp import views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', views.index, name='index'),
+    url(r'^api/v1/consumers/create/$', views.create_consumer, name='create_consumer'),
     url(r'^api/v1/consumers/(?P<consumer_pk>[0-9]+)/$', views.get_consumer, name='get_consumer'),
 ]
