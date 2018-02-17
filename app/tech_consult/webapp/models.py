@@ -15,11 +15,6 @@ class Consumer(models.Model):
     def __str__(self):
         return "%s" % (self.username)
 
-class Review(models.Model):
-    rating = models.IntegerField(default = 0)
-    author = models.CharField(max_length=50, default="none")
-    comment = models.CharField(max_length=150, default="none")
-
 class Producer(models.Model):
     username = models.CharField(max_length=200, default="none", unique=True)
     password = models.CharField(max_length=200, default="none")
@@ -29,21 +24,28 @@ class Producer(models.Model):
     email = models.EmailField(max_length=200, default="none")
     bio = models.CharField(max_length=250, default="none")
     skills = models.CharField(max_length=200, default="none")
-    review = models.ForeignKey(Review)
-    #consumer = models.ForeignKey(Consumer)
-    #user = models.ForeignKey(User)
+   
 
     def __str__(self):
         return "%s" % (self.username)
+
+class Review(models.Model):
+    rating = models.IntegerField(default = 1)
+    comment = models.CharField(max_length=150, default="none")
+    producer = models.ForeignKey(Producer, default=1)
+    author = models.ForeignKey(Consumer, default=1)
+
+# def __str__(self):
+#      return "%s" % (self.username)
 
 class ConsumerRequest(models.Model):
     title = models.CharField(max_length=50, default="none")
     offered_price = models.FloatField(max_length=10)
     description = models.CharField(max_length=200)
-    timestamp = models.DateTimeField(auto_now_add = True)
+    timestamp = models.CharField(max_length=50)
     availability = models.CharField(max_length=50)
-    consumer = models.ForeignKey(Consumer)
-    accepted_producer = models.ForeignKey(Producer)
+    consumer = models.ForeignKey(Consumer, default=1)
+    accepted_producer = models.ForeignKey(Producer, default=1)
 
-    def __str__(self):
-        return self.description
+#  def __str__(self):
+#       return self.description
