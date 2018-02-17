@@ -383,7 +383,7 @@ def get_review(request, review_pk):
 
     return JsonResponse(response)
 
-
+@csrf_exempt
 def create_review(request):
     response = {}
     response_data = {}
@@ -398,11 +398,11 @@ def create_review(request):
 
                 # Creating the consumer based on form input
                 review = Review()
-                review.rating = form.cleaned_data['rating']
-                author = Consumer.objects.get(form.cleaned_data['author'])
+                review.rating = int(form.cleaned_data['rating'])
+                author = Consumer.objects.get(pk = int(form.cleaned_data['author']))
                 review.author = author
                 review.comment = form.cleaned_data['comment']
-                producer = Producer.objects.get(form.cleaned_data['producer'])
+                producer = Producer.objects.get(pk = int(form.cleaned_data['producer']))
                 review.producer = producer
 
                 review.save()
@@ -422,7 +422,7 @@ def create_review(request):
             form = UpdateReviewForm()
             return render(request, 'update_review.html', {'form': form, 'update': False})
 
-    except:
+    except Review.DoesNotExist:
         response['ok'] = False
     response['result'] = response_data
 
@@ -430,7 +430,7 @@ def create_review(request):
 
     return JsonResponse(response)
 
-
+@csrf_exempt
 def update_review(request, review_pk):
     response = {}
     response_data = {}
@@ -446,11 +446,11 @@ def update_review(request, review_pk):
                 response['ok'] = True
 
                 # Updating the consumer based on form input
-                review.rating = form.cleaned_data['rating']
-                author = Consumer.objects.get(form.cleaned_data['author'])
+                review.rating = int(form.cleaned_data['rating'])
+                author = Consumer.objects.get(pk = int(form.cleaned_data['author']))
                 review.author = author
                 review.comment = form.cleaned_data['comment']
-                producer = Producer.objects.get(form.cleaned_data['producer'])
+                producer = Producer.objects.get(pk = int(form.cleaned_data['producer']))
                 review.producer = producer
 
                 review.save()
@@ -483,7 +483,7 @@ def update_review(request, review_pk):
 
     return JsonResponse(response)
 
-
+@csrf_exempt
 def delete_review(request, review_pk):
     response = {}
     response_data = {}
@@ -538,7 +538,7 @@ def get_consumerRequest(request, consumerRequest_pk):
 
     return JsonResponse(response)
 
-
+@csrf_exempt
 def create_consumerRequest(request):
 
     response = {}
@@ -554,13 +554,13 @@ def create_consumerRequest(request):
             # Creating the consumer based on form input
             consumerRequest = ConsumerRequest()
             consumerRequest.title = form.cleaned_data['title']
-            consumerRequest.offered_price = form.cleaned_data['offered_price']
+            consumerRequest.offered_price = float(form.cleaned_data['offered_price'])
             consumerRequest.description = form.cleaned_data['description']
             consumerRequest.timestamp = form.cleaned_data['timestamp']
             consumerRequest.availability = form.cleaned_data['availability']
-            consumer = Consumer.objects.get(form.cleaned_data['consumer'])
+            consumer = Consumer.objects.get(pk = int(form.cleaned_data['consumer']))
             consumerRequest.consumer = consumer
-            producer = Producer.objects.get(form.cleaned_data['accepted_producer'])
+            producer = Producer.objects.get(pk = int(form.cleaned_data['accepted_producer']))
             consumerRequest.accepted_producer = producer
 
             consumerRequest.save()
@@ -593,6 +593,7 @@ def create_consumerRequest(request):
 
     return JsonResponse(response)
 
+@csrf_exempt
 def update_consumerRequest(request, consumerRequest_pk):
     response = {}
     response_data = {}
@@ -609,11 +610,11 @@ def update_consumerRequest(request, consumerRequest_pk):
 
                 # Updating the consumer based on form input
                 consumerRequest.title = form.cleaned_data['title']
-                consumerRequest.offered_price = form.cleaned_data['offered_price']
+                consumerRequest.offered_price = float(form.cleaned_data['offered_price'])
                 consumerRequest.description = form.cleaned_data['description']
                 consumerRequest.timestamp = form.cleaned_data['timestamp']
                 consumerRequest.availability = form.cleaned_data['availability']
-                consumer = Consumer.objects.get(form.cleaned_data['consumer'])
+                consumer = Consumer.objects.get(pk = int(form.cleaned_data['consumer']))
                 consumerRequest.consumer = consumer
                 producer = Producer.objects.get(form.cleaned_data['accepted_producer'])
                 consumerRequest.accepted_producer = producer
@@ -653,7 +654,7 @@ def update_consumerRequest(request, consumerRequest_pk):
 
     return JsonResponse(response)
 
-
+@csrf_exempt
 def delete_consumerRequest(request, consumer_pk):
 
     response = {}

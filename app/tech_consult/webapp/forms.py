@@ -34,7 +34,7 @@ class UpdateReviewForm(forms.Form):
     producer =forms.IntegerField(help_text="Producer PK: ")
 
 
-class UpdateConsumerRequestForm(ModelForm):
+class UpdateConsumerRequestForm(forms.Form):
     title = forms.CharField(max_length=200, help_text="Title: ")
     offered_price = forms.FloatField(help_text="Offered Price: ")
     description = forms.CharField(max_length=200, help_text="Description: ")
