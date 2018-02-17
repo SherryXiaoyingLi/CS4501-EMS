@@ -42,7 +42,7 @@ class ConsumerRequest(models.Model):
     title = models.CharField(max_length=50, default="none")
     offered_price = models.FloatField(max_length=10)
     description = models.CharField(max_length=200)
-    timestamp = models.DateTimeField(auto_now_add = True)
+    timestamp = models.CharField(max_length=50)
     availability = models.CharField(max_length=50)
     consumer = models.ForeignKey(Consumer, default=1)
     accepted_producer = models.ForeignKey(Producer, default=1)
