@@ -43,7 +43,7 @@ def get_consumer (request, consumer_pk):
             #response_data['phone'] = '7037316926'
             #response_data['email'] = 'myl2vu@virginia.edu'
 
-        except Consumer.DoesNotExist:
+        except:
             response['ok'] = False
 
         response['result'] = response_data
@@ -160,28 +160,28 @@ def update_consumer (request, consumer_pk):
 #Does not yet work with Postman
 @csrf_exempt
 def delete_consumer (request, consumer_pk):
-    if request.method == 'POST':
-      response = {}
-      response_data = {}
-      try:
-            consumer = Consumer.objects.get(pk=consumer_pk)
 
-            response['ok'] = True
+    response = {}
+    response_data = {}
+    try:
+        consumer = Consumer.objects.get(pk=consumer_pk)
 
-            # Adding the deleted consumer's data to json response
-            response_data['pk'] = consumer.pk
-            response_data['username'] = consumer.username
-            response_data['password'] = consumer.password
-            response_data['first_name'] = consumer.first_name
-            response_data['last_name'] = consumer.last_name
-            response_data['phone'] = consumer.phone
-            response_data['email'] = consumer.email
+        response['ok'] = True
 
-            consumer.delete()
-      except Consumer.DoesNotExist:
-            response['ok'] = False
-      response['result'] = response_data
-      return JsonResponse(response)
+        # Adding the deleted consumer's data to json response
+        response_data['pk'] = consumer.pk
+        response_data['username'] = consumer.username
+        response_data['password'] = consumer.password
+        response_data['first_name'] = consumer.first_name
+        response_data['last_name'] = consumer.last_name
+        response_data['phone'] = consumer.phone
+        response_data['email'] = consumer.email
+
+        consumer.delete()
+    except:
+        response['ok'] = False
+    response['result'] = response_data
+    return JsonResponse(response)
 
 #@csrf_exempt
 def get_producer (request, producer_pk):
@@ -213,7 +213,7 @@ def get_producer (request, producer_pk):
             #response_data['phone'] = '7037316926'
             #response_data['email'] = 'myl2vu@virginia.edu'
 
-        except Producer.DoesNotExist:
+        except:
             response['ok'] = False
 
         response['result'] = response_data
@@ -324,7 +324,7 @@ def update_producer (request, producer_pk):
             form = UpdateProducerForm(initial={'username':producer.username, 'password': producer.password, 'first_name': producer.first_name, 'last_name': producer.last_name, 'phone': producer.phone, 'email': producer.email})
             return render(request, 'update_producer.html', {'form': form, 'update': True})
 
-    except Producer.DoesNotExist:
+    except:
         response['ok'] = False
 
         response['result'] = response_data
@@ -332,7 +332,7 @@ def update_producer (request, producer_pk):
     return JsonResponse(response)
 @csrf_exempt
 def delete_producer (request, producer_pk):
-   if request.method == 'POST':
+
     response = {}
     response_data = {}
     try:
@@ -349,10 +349,10 @@ def delete_producer (request, producer_pk):
         response_data['phone'] = producer.phone
         response_data['email'] = producer.email
         response_data['bio'] = producer.bio
-        response_data['skills'] = producer.skills 
+        response_data['skills'] = producer.skills
 
         producer.delete()
-    except Producer.DoesNotExist:
+    except:
         response['ok'] = False
 
     response['result'] = response_data
@@ -372,21 +372,11 @@ def get_review(request, review_pk):
             # Uncommented until we load database with data
             response_data['pk'] = review.pk
             response_data['rating'] = review.rating
-            response_data['author'] = review.author
+            response_data['author'] = review.author.pk
             response_data['comment'] = review.comment
-            response_data['producer'] = review.producer
-    
+            response_data['producer'] = review.producer.pk
 
-
-        # response_data['pk'] = 1
-        # response_data['username'] = 'myl2vu'
-        # response_data['password'] = 'ilikeseals'
-        # response_data['first_name'] = 'marissa'
-        # response_data['last_name'] = 'lee'
-        # response_data['phone'] = '7037316926'
-        # response_data['email'] = 'myl2vu@virginia.edu'
-
-        except Review.DoesNotExist:
+        except:
             response['ok'] = False
 
         response['result'] = response_data
@@ -398,40 +388,47 @@ def create_review(request):
     response = {}
     response_data = {}
 
-    if request.method == 'POST':
-        form = UpdateReviewForm(request.POST)
+    try:
+        if request.method == 'POST':
+            form = UpdateReviewForm(request.POST)
 
-        if form.is_valid():
+            if form.is_valid():
 
-            response['ok'] = True
+                response['ok'] = True
 
-            # Creating the consumer based on form input
-            review = Review()
-            review.rating = form.cleaned_data['rating']
-            review.author = form.cleaned_data['author']
-            review.comment = form.cleaned_data['comment']
-            review.producer = form.cleaned_data['producer']
+                # Creating the consumer based on form input
+                review = Review()
+                review.rating = form.cleaned_data['rating']
+                author = Consumer.objects.get(form.cleaned_data['author'])
+                review.author = author
+                review.comment = form.cleaned_data['comment']
+                producer = Producer.objects.get(form.cleaned_data['producer'])
+                review.producer = producer
 
-            review.save()
+                review.save()
 
-            # Adding the created consumer's data to json response
-            response_data['pk'] = review.pk
-            response_data['rating'] = review.rating
-            response_data['author'] = review.author
-            response_data['comment'] = review.comment
-            response_data['producer'] = review.producer
- 
+                # Adding the created consumer's data to json response
+                response_data['pk'] = review.pk
+                response_data['rating'] = review.rating
+                response_data['author'] = review.author.pk
+                response_data['comment'] = review.comment
+                response_data['producer'] = review.producer.pk
+
+            else:
+                response['ok'] = False
+
         else:
-            response['ok'] = False
+            # An unfilled form gets displayed
+            form = UpdateReviewForm()
+            return render(request, 'update_review.html', {'form': form, 'update': False})
 
-        response['result'] = response_data
+    except:
+        response['ok'] = False
+    response['result'] = response_data
 
-        return JsonResponse(response)
 
-    else:
-        # An unfilled form gets displayed
-        form = UpdateReviewForm()
-        return render(request, 'update_review.html', {'form': form, 'update': False})
+
+    return JsonResponse(response)
 
 
 def update_review(request, review_pk):
@@ -450,18 +447,20 @@ def update_review(request, review_pk):
 
                 # Updating the consumer based on form input
                 review.rating = form.cleaned_data['rating']
-                review.author = form.cleaned_data['author']
+                author = Consumer.objects.get(form.cleaned_data['author'])
+                review.author = author
                 review.comment = form.cleaned_data['comment']
-                review.producer = form.cleaned_data['producer']
+                producer = Producer.objects.get(form.cleaned_data['producer'])
+                review.producer = producer
 
                 review.save()
 
                 # Adding the updated consumer's data to json response
                 response_data['pk'] = reviewer.pk
                 response_data['rating'] = review.rating
-                response_data['author'] = review.author
+                response_data['author'] = review.author.pk
                 response_data['comment'] = review.comment
-                response_data['producer'] = review.producer
+                response_data['producer'] = review.producer.pk
 
 
             else:
@@ -474,10 +473,10 @@ def update_review(request, review_pk):
         # The form filled with the consumer's data
         else:
             form = UpdateReviewForm(
-                                    initial={'rating': review.rating, 'author': review.author, 'comment': review.comment,'producer':review.producer})
+                                    initial={'rating': review.rating, 'author': review.author.pk, 'comment': review.comment,'producer':review.producer.pk})
             return render(request, 'update_review.html', {'form': form, 'update': True})
 
-    except Review.DoesNotExist:
+    except:
         response['ok'] = False
 
         response['result'] = response_data
@@ -497,13 +496,13 @@ def delete_review(request, review_pk):
         # Adding the deleted consumer's data to json response
         response_data['pk'] = review.pk
         response_data['rating'] = review.rating
-        response_data['author'] = review.author
+        response_data['author'] = review.author.pk
         response_data['comment'] = review.comment
-        response_data['producer'] = review.producer
+        response_data['producer'] = review.producer.pk
 
         review.delete()
 
-    except Review.DoesNotExist:
+    except:
         response['ok'] = False
 
     response['result'] = response_data
@@ -528,19 +527,11 @@ def get_consumerRequest(request, consumerRequest_pk):
             response_data['description'] = consumerRequest.description
             response_data['timestamp'] = consumerRequest.timestamp
             response_data['availability'] = consumerRequest.availability
-            response_data['consumer'] = consumerRequest.consumer
-            response_data['accepted_producer'] = consumerRequest.accepted_producer
+            response_data['consumer'] = consumerRequest.consumer.pk
+            response_data['accepted_producer'] = consumerRequest.producer.pk
 
 
-            # response_data['pk'] = 1
-            # response_data['username'] = 'myl2vu'
-            # response_data['password'] = 'ilikeseals'
-            # response_data['first_name'] = 'marissa'
-            # response_data['last_name'] = 'lee'
-            # response_data['phone'] = '7037316926'
-            # response_data['email'] = 'myl2vu@virginia.edu'
-
-        except ConsumerRequest.DoesNotExist:
+        except:
             response['ok'] = False
 
         response['result'] = response_data
@@ -567,8 +558,10 @@ def create_consumerRequest(request):
             consumerRequest.description = form.cleaned_data['description']
             consumerRequest.timestamp = form.cleaned_data['timestamp']
             consumerRequest.availability = form.cleaned_data['availability']
-            consumerRequest.consumer = form.cleaned_data['consumer']
-            consumerRequest.accepted_producer = form.cleaned_data['accepted_producer']
+            consumer = Consumer.objects.get(form.cleaned_data['consumer'])
+            consumerRequest.consumer = consumer
+            producer = Producer.objects.get(form.cleaned_data['accepted_producer'])
+            consumerRequest.accepted_producer = producer
 
             consumerRequest.save()
 
@@ -579,8 +572,8 @@ def create_consumerRequest(request):
             response_data['description'] = consumerRequest.description
             response_data['timestamp'] = consumerRequest.timestamp
             response_data['availability'] = consumerRequest.availability
-            response_data['consumer'] = consumerRequest.consumer
-            response_data['accepted_producer'] = consumerRequest.accepted_producer
+            response_data['consumer'] = consumerRequest.consumer.pk
+            response_data['accepted_producer'] = consumerRequest.accepted_producer.pk
 
         else:
             response['ok'] = False
@@ -620,8 +613,10 @@ def update_consumerRequest(request, consumerRequest_pk):
                 consumerRequest.description = form.cleaned_data['description']
                 consumerRequest.timestamp = form.cleaned_data['timestamp']
                 consumerRequest.availability = form.cleaned_data['availability']
-                consumerRequest.consumer = form.cleaned_data['consumer']
-                consumerRequest.accepted_producer = form.cleaned_data['accepted_producer']
+                consumer = Consumer.objects.get(form.cleaned_data['consumer'])
+                consumerRequest.consumer = consumer
+                producer = Producer.objects.get(form.cleaned_data['accepted_producer'])
+                consumerRequest.accepted_producer = producer
 
                 consumerRequest.save()
 
@@ -632,8 +627,8 @@ def update_consumerRequest(request, consumerRequest_pk):
                 response_data['description'] = consumerRequest.description
                 response_data['timestamp'] = consumerRequest.timestamp
                 response_data['availability'] = consumerRequest.availability
-                response_data['consumer'] = consumerRequest.consumer
-                response_data['accepted_producer'] = consumerRequest.accepted_producer
+                response_data['consumer'] = consumerRequest.consumer.pk
+                response_data['accepted_producer'] = consumerRequest.accepted_producer.pk
 
             else:
                 response['ok'] = False
@@ -647,11 +642,11 @@ def update_consumerRequest(request, consumerRequest_pk):
             form = UpdateConsumerRequestForm(
                 initial={'title': consumerRequest.title, 'offered_price': consumerRequest.offered_price,
                          'description': consumerRequest.description, 'timestamp': consumerRequest.timestamp,
-                         'availability': consumerRequest.availability, 'consumer': consumerRequest.consumer,
-                         'accepted_producer': consumerRequest.accepted_producer})
+                         'availability': consumerRequest.availability, 'consumer': consumerRequest.consumer.pk,
+                         'accepted_producer': consumerRequest.accepted_producer.pk})
             return render(request, 'update_consumerRequest.html', {'form': form, 'update': True})
 
-    except ConsumerRequest.DoesNotExist:
+    except:
         response['ok'] = False
 
         response['result'] = response_data
@@ -660,7 +655,7 @@ def update_consumerRequest(request, consumerRequest_pk):
 
 
 def delete_consumerRequest(request, consumer_pk):
-  if request.method == 'POST':
+
     response = {}
     response_data = {}
     try:
@@ -675,12 +670,12 @@ def delete_consumerRequest(request, consumer_pk):
         response_data['description'] = consumerRequest.description
         response_data['timestamp'] = consumerRequest.timestamp
         response_data['availability'] = consumerRequest.availability
-        response_data['consumer'] = consumerRequest.consumer
-        response_data['accepted_producer'] = consumerRequest.accepted_producer
+        response_data['consumer'] = consumerRequest.consumer.pk
+        response_data['accepted_producer'] = consumerRequest.accepted_producer.pk
 
         consumerRequest.delete()
 
-    except ConsumerRequest.DoesNotExist:
+    except:
         response['ok'] = False
 
     response['result'] = response_data
