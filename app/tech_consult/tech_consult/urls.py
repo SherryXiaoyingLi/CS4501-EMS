@@ -35,7 +35,7 @@ urlpatterns = [
     url(r'^api/v1/reviews/(?P<review_pk>[0-9]+)/update/$', views.update_review, name='update_review'),
     url(r'^api/v1/reviews/(?P<review_pk>[0-9]+)/delete/$', views.delete_review, name='delete_review'),
     url(r'^api/v1/consumerRequests/create/$', views.create_consumerRequest, name='create_consumerRequest'),
-    url(r'^api/v1/consumerRequests/(?P<review_pk>[0-9]+)/$', views.get_consumerRequest, name='get_consumerRequest'),
-    url(r'^api/v1/consumerRequests/(?P<review_pk>[0-9]+)/update/$', views.update_consumerRequest, name='update_consumerRequest'),
-    url(r'^api/v1/consumerRequests/(?P<review_pk>[0-9]+)/delete/$', views.delete_consumerRequest, name='delete_consumerRequest'),
+    url(r'^api/v1/consumerRequests/(?P<consumerRequest_pk>[0-9]+)/$', views.get_consumerRequest, name='get_consumerRequest'),
+    url(r'^api/v1/consumerRequests/(?P<consumerRequest_pk>[0-9]+)/update/$', views.update_consumerRequest, name='update_consumerRequest'),
+    url(r'^api/v1/consumerRequests/(?P<consumerRequest_pk>[0-9]+)/delete/$', views.delete_consumerRequest, name='delete_consumerRequest'),
 ]
