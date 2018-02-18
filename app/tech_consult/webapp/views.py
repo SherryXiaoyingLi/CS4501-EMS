@@ -5,6 +5,7 @@ import json
 from django.http import HttpResponse
 from django.http import JsonResponse
 from .models import Consumer, ConsumerRequest, Producer, Review
+from .forms import CreateConsumerForm, CreateProducerForm, CreateReviewForm, CreateConsumerRequestForm
 from .forms import UpdateConsumerForm, UpdateReviewForm, UpdateConsumerRequestForm, UpdateProducerForm
 from django.views.decorators.csrf import csrf_exempt
 
@@ -56,7 +57,7 @@ def create_consumer (request):
     response_data = {}
     try:
         if request.method == 'POST':
-            form = UpdateConsumerForm(request.POST)
+            form = CreateConsumerForm(request.POST)
 
             if form.is_valid():
 
@@ -92,7 +93,7 @@ def create_consumer (request):
 
         else:
             # An unfilled form gets displayed
-            form = UpdateConsumerForm()
+            form = CreateConsumerForm()
             return render(request, 'update_consumer.html', {'form': form, 'update': False})
     except:
         response['ok'] = False
@@ -118,13 +119,19 @@ def update_consumer (request, consumer_pk):
 
                 response['ok'] = True
 
-                # Updating the consumer based on form input
-                consumer.username = form.cleaned_data['username']
-                consumer.password = form.cleaned_data['password']
-                consumer.first_name = form.cleaned_data['first_name']
-                consumer.last_name = form.cleaned_data['last_name']
-                consumer.phone = form.cleaned_data['phone']
-                consumer.email = form.cleaned_data['email']
+                # Updating the consumer based on form input, only for filled fields
+                if form.cleaned_data['username']:
+                    consumer.username = form.cleaned_data['username']
+                if form.cleaned_data['password']:
+                    consumer.password = form.cleaned_data['password']
+                if form.cleaned_data['first_name']:
+                    consumer.first_name = form.cleaned_data['first_name']
+                if form.cleaned_data['last_name']:
+                    consumer.last_name = form.cleaned_data['last_name']
+                if form.cleaned_data['phone']:
+                    consumer.phone = form.cleaned_data['phone']
+                if form.cleaned_data['email']:
+                    consumer.email = form.cleaned_data['email']
 
                 consumer.save()
 
@@ -145,9 +152,9 @@ def update_consumer (request, consumer_pk):
             return JsonResponse(response)
 
         # The form filled with the consumer's data
-        #else:
-        #    form = UpdateConsumerForm(initial={'username':consumer.username, 'password': consumer.password, 'first_name': consumer.first_name, 'last_name': consumer.last_name, 'phone': consumer.phone, 'email': consumer.email})
-        #    return render(request, 'update_consumer.html', {'form': form, 'update': True})
+        else:
+            form = UpdateConsumerForm(initial={'username':consumer.username, 'password': consumer.password, 'first_name': consumer.first_name, 'last_name': consumer.last_name, 'phone': consumer.phone, 'email': consumer.email})
+            return render(request, 'update_consumer.html', {'form': form, 'update': True})
 
     except:
         response['ok'] = False
@@ -205,14 +212,6 @@ def get_producer (request, producer_pk):
             response_data['bio'] = producer.bio
             response_data['skills'] = producer.skills
 
-            #response_data['pk'] = 1
-            #response_data['username'] = 'myl2vu'
-            #response_data['password'] = 'ilikeseals'
-            #response_data['first_name'] = 'marissa'
-            #response_data['last_name'] = 'lee'
-            #response_data['phone'] = '7037316926'
-            #response_data['email'] = 'myl2vu@virginia.edu'
-
         except:
             response['ok'] = False
 
@@ -226,7 +225,7 @@ def create_producer (request):
     response_data = {}
     try:
       if request.method == 'POST':
-        form = UpdateProducerForm(request.POST)
+        form = CreateProducerForm(request.POST)
 
         if form.is_valid():
 
@@ -265,7 +264,7 @@ def create_producer (request):
 
       else:
         # An unfilled form gets displayed
-        form = UpdateProducerForm()
+        form = CreateProducerForm()
         return render(request, 'update_producer.html', {'form': form, 'update': False})
     except:
         response['ok'] = False
@@ -289,15 +288,23 @@ def update_producer (request, producer_pk):
 
                 response['ok'] = True
 
-                # Updating the producer based on form input
-                producer.username = form.cleaned_data['username']
-                producer.password = form.cleaned_data['password']
-                producer.first_name = form.cleaned_data['first_name']
-                producer.last_name = form.cleaned_data['last_name']
-                producer.phone = form.cleaned_data['phone']
-                producer.email = form.cleaned_data['email']
-                producer.bio = form.cleaned_data['bio']
-                producer.skills = form.cleaned_data['skills']
+                # Updating the producer based on form input, only for filled fields
+                if form.cleaned_data['username']:
+                    producer.username = form.cleaned_data['username']
+                if form.cleaned_data['password']:
+                    producer.password = form.cleaned_data['password']
+                if form.cleaned_data['first_name']:
+                    producer.first_name = form.cleaned_data['first_name']
+                if form.cleaned_data['last_name']:
+                    producer.last_name = form.cleaned_data['last_name']
+                if form.cleaned_data['phone']:
+                    producer.phone = form.cleaned_data['phone']
+                if form.cleaned_data['email']:
+                    producer.email = form.cleaned_data['email']
+                if form.cleaned_data['bio']:
+                    producer.bio = form.cleaned_data['bio']
+                if form.cleaned_data['skills']:
+                    producer.skills = form.cleaned_data['skills']
 
                 producer.save()
 
@@ -330,6 +337,7 @@ def update_producer (request, producer_pk):
         response['result'] = response_data
 
     return JsonResponse(response)
+
 @csrf_exempt
 def delete_producer (request, producer_pk):
 
@@ -390,7 +398,7 @@ def create_review(request):
 
     try:
         if request.method == 'POST':
-            form = UpdateReviewForm(request.POST)
+            form = CreateReviewForm(request.POST)
 
             if form.is_valid():
 
@@ -419,10 +427,10 @@ def create_review(request):
 
         else:
             # An unfilled form gets displayed
-            form = UpdateReviewForm()
+            form = CreateReviewForm()
             return render(request, 'update_review.html', {'form': form, 'update': False})
 
-    except Review.DoesNotExist:
+    except:
         response['ok'] = False
     response['result'] = response_data
 
@@ -445,18 +453,22 @@ def update_review(request, review_pk):
 
                 response['ok'] = True
 
-                # Updating the consumer based on form input
-                review.rating = int(form.cleaned_data['rating'])
-                author = Consumer.objects.get(pk = int(form.cleaned_data['author']))
-                review.author = author
-                review.comment = form.cleaned_data['comment']
-                producer = Producer.objects.get(pk = int(form.cleaned_data['producer']))
-                review.producer = producer
+                # Updating the review based on form input only if the fields are filled in
+                if form.cleaned_data['rating']:
+                    review.rating = int(form.cleaned_data['rating'])
+                if form.cleaned_data['author']:
+                    author = Consumer.objects.get(pk = int(form.cleaned_data['author']))
+                    review.author = author
+                if form.cleaned_data['comment']:
+                    review.comment = form.cleaned_data['comment']
+                if form.cleaned_data['producer']:
+                    producer = Producer.objects.get(pk = int(form.cleaned_data['producer']))
+                    review.producer = producer
 
                 review.save()
 
                 # Adding the updated consumer's data to json response
-                response_data['pk'] = reviewer.pk
+                response_data['pk'] = review.pk
                 response_data['rating'] = review.rating
                 response_data['author'] = review.author.pk
                 response_data['comment'] = review.comment
@@ -476,7 +488,7 @@ def update_review(request, review_pk):
                                     initial={'rating': review.rating, 'author': review.author.pk, 'comment': review.comment,'producer':review.producer.pk})
             return render(request, 'update_review.html', {'form': form, 'update': True})
 
-    except:
+    except Review:
         response['ok'] = False
 
         response['result'] = response_data
@@ -545,7 +557,7 @@ def create_consumerRequest(request):
     response_data = {}
     try:
       if request.method == 'POST':
-        form = UpdateConsumerRequestForm(request.POST)
+        form = CreateConsumerRequestForm(request.POST)
 
         if form.is_valid():
 
@@ -584,7 +596,7 @@ def create_consumerRequest(request):
 
       else:
         # An unfilled form gets displayed
-        form = UpdateConsumerRequestForm()
+        form = CreateConsumerRequestForm()
         return render(request, 'update_consumerRequest.html', {'form': form, 'update': False})
     except:
         response['ok'] = False
@@ -608,20 +620,27 @@ def update_consumerRequest(request, consumerRequest_pk):
 
                 response['ok'] = True
 
-                # Updating the consumer based on form input
-                consumerRequest.title = form.cleaned_data['title']
-                consumerRequest.offered_price = float(form.cleaned_data['offered_price'])
-                consumerRequest.description = form.cleaned_data['description']
-                consumerRequest.timestamp = form.cleaned_data['timestamp']
-                consumerRequest.availability = form.cleaned_data['availability']
-                consumer = Consumer.objects.get(pk = int(form.cleaned_data['consumer']))
-                consumerRequest.consumer = consumer
-                producer = Producer.objects.get(form.cleaned_data['accepted_producer'])
-                consumerRequest.accepted_producer = producer
+                # Updating the consumer request based on form input if the forms are filled
+                if form.cleaned_data['title']:
+                    consumerRequest.title = form.cleaned_data['title']
+                if form.cleaned_data['offered_price']:
+                    consumerRequest.offered_price = float(form.cleaned_data['offered_price'])
+                if form.cleaned_data['description']:
+                    consumerRequest.description = form.cleaned_data['description']
+                if form.cleaned_data['timestamp']:
+                    consumerRequest.timestamp = form.cleaned_data['timestamp']
+                if form.cleaned_data['availability']:
+                    consumerRequest.availability = form.cleaned_data['availability']
+                if form.cleaned_data['consumer']:
+                    consumer = Consumer.objects.get(pk = int(form.cleaned_data['consumer']))
+                    consumerRequest.consumer = consumer
+                if form.cleaned_data['accepted_producer']:
+                    producer = Producer.objects.get(form.cleaned_data['accepted_producer'])
+                    consumerRequest.accepted_producer = producer
 
                 consumerRequest.save()
 
-                # Adding the updated consumer's data to json response
+                # Adding the updated consumer request's data to json response
                 response_data['pk'] = consumerRequest.pk
                 response_data['title'] = consumerRequest.title
                 response_data['offered_price'] = consumerRequest.offered_price
@@ -655,7 +674,7 @@ def update_consumerRequest(request, consumerRequest_pk):
     return JsonResponse(response)
 
 @csrf_exempt
-def delete_consumerRequest(request, consumer_pk):
+def delete_consumerRequest(request, consumerRequest_pk):
 
     response = {}
     response_data = {}

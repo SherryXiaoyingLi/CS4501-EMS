@@ -1,8 +1,8 @@
 # CS4501-EMS
 4501 ISA Project
-* Elliott Kim (ek4tx)
-* Marissa Lee (myl2vu)
-* Sherry Li (xl2gs)
+* Elliott Kim (ek4tx) - etkim97
+* Marissa Lee (myl2vu) - Shardi3
+* Sherry Li (xl2gs) - LiXiaoying
 
 # Project 2
 
@@ -43,7 +43,7 @@
 
 
 ## Services
-At the moment, update assumes you pass in all fields with values.
+All fields need to be entered for CREATE, but not UPDATE
 
 ### Consumer
 * /api/v1/consumers/1
