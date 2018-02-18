@@ -32,7 +32,7 @@
 * author (foreign key of Consumer)
 * producer (foreign key)
 
-### Consumer request
+### Consumer Request
 * title
 * offered_price (float)
 * description
@@ -43,27 +43,28 @@
 
 
 ## Services
+At the moment, update assumes you pass in all fields with values.
 
 ### Consumer
-*/api/v1/consumers/1
-*/api/v1/consumers/create
-*/api/v1/consumers/1/update
-*/api/v1/consumers/1/delete
+* /api/v1/consumers/1
+* /api/v1/consumers/create
+* /api/v1/consumers/1/update
+* /api/v1/consumers/1/delete
 
 ### Producer
-*/api/v1/producers/1
-*/api/v1/producers/create
-*/api/v1/producers/1/update
-*/api/v1/producers/1/delete
+* /api/v1/producers/1
+* /api/v1/producers/create
+* /api/v1/producers/1/update
+* /api/v1/producers/1/delete
 
 ### Review
-*/api/v1/reviews/1
-*/api/v1/reviews/create
-*/api/v1/reviews/1/update
-*/api/v1/reviews/1/delete
+* /api/v1/reviews/1
+* /api/v1/reviews/create
+* /api/v1/reviews/1/update
+* /api/v1/reviews/1/delete
 
 ### ConsumerRequest
-*/api/v1/consumerRequests/1
-*/api/v1/consumerRequests/create
-*/api/v1/consumerRequests/1/update
-*/api/v1/consumerRequests/1/delete
+* /api/v1/consumerRequests/1
+* /api/v1/consumerRequests/create
+* /api/v1/consumerRequests/1/update
+* /api/v1/consumerRequests/1/delete
