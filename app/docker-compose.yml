@@ -1,9 +1,29 @@
 models:
     image: tp33/django
     external_links:
-      -  mysql:db
+      - mysql:db
     volumes:
       - ./tech_consult/:/app
     ports:
       - "8001:8000"
     command: bash -c "python manage.py makemigrations && python manage.py migrate && python manage.py loaddata db.json && mod_wsgi-express start-server --working-directory /app --reload-on-changes /app/tech_consult/wsgi.py"
+
+exp:
+    image: tp33/django
+    links:
+      - models:models-api
+    volumes:
+      - ./tech_consult_exp/:/app
+    ports:
+      - "8002:8000"
+    command: bash -c "mod_wsgi-express start-server --working-directory /app --reload-on-changes /app/tech_consult_exp/wsgi.py"
+
+web:
+    image: tp33/django
+    links:
+      - exp:exp-api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./tech_consult_web:/app
+    command: bash -c "mod_wsgi-express start-server --working-directory /app --reload-on-changes /app/tech_consult_web/wsgi.py"

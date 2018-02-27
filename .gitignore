@@ -4,11 +4,22 @@
 #pycharm
 .idea
 app/tech_consult/.idea/
+app/tech_consult_exp/.idea/
+app/tech_consult_web/.idea/
+
+#pycache
 app/tech_consult/tech_consult/__pycache__/
 app/tech_consult/webapp/__pycache__/
+app/tech_consult_exp/tech_consult_exp/__pycache__/
+app/tech_consult_exp/webapp_exp/__pycache__/
+app/tech_consult_web/tech_consult_web/__pycache__/
+app/tech_consult_web/webapp_web/__pycache__/
 
 #migrations
 app/tech_consult/webapp/migrations/
+#there should not be migrations in webapp_exp and webapp_web
+app/tech_consult_exp/webapp_exp/migrations/
+app/tech_consult_web/webapp_web/migrations/
 
 #OS X
 app/.DS_Store
