@@ -12,8 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 # Create your views here.
 
 def index(request):
-
-    return HttpResponse("CS4501 Project 2")
+    return HttpResponse("CS4501 Project 3, Microservice layer")
 
 # json response code based on https://stackoverflow.com/questions/2428092/creating-a-json-response-using-django-and-python
 def get_consumer (request, consumer_pk):
