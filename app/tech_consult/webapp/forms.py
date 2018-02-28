@@ -71,7 +71,7 @@ class CreateConsumerRequestForm(forms.Form):
     timestamp = forms.CharField(max_length=200, help_text="Timestamp: ")
     availability = forms.CharField(max_length=200, help_text="Availability: ")
     consumer = forms.IntegerField(help_text="Consumer PK: ")
-    accepted_producer = forms.IntegerField(help_text="Producer PK: ")
+    accepted_producer = forms.IntegerField(help_text="Producer PK: ", required=False)
 
 # Same as CreateConsumerRequestForm except fields are optional
 class UpdateConsumerRequestForm(forms.Form):
