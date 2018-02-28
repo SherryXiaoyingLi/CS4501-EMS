@@ -45,7 +45,7 @@ class ConsumerRequest(models.Model):
     timestamp = models.CharField(max_length=50)
     availability = models.CharField(max_length=50)
     consumer = models.ForeignKey(Consumer, default=1)
-    accepted_producer = models.ForeignKey(Producer, default=1)
+    accepted_producer = models.ForeignKey(Producer, null=True)
 
 #  def __str__(self):
 #       return self.description

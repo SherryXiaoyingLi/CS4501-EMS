@@ -571,8 +571,10 @@ def create_consumerRequest(request):
             consumerRequest.availability = form.cleaned_data['availability']
             consumer = Consumer.objects.get(pk = int(form.cleaned_data['consumer']))
             consumerRequest.consumer = consumer
-            producer = Producer.objects.get(pk = int(form.cleaned_data['accepted_producer']))
-            consumerRequest.accepted_producer = producer
+            #producer = Producer.objects.get(pk = int(form.cleaned_data['accepted_producer']))
+            if form.cleaned_data['accepted_producer']:
+                producer = Producer.objects.get(pk = int(form.cleaned_data['accepted_producer']))
+                consumerRequest.accepted_producer = producer
 
             consumerRequest.save()
 
@@ -584,8 +586,10 @@ def create_consumerRequest(request):
             response_data['timestamp'] = consumerRequest.timestamp
             response_data['availability'] = consumerRequest.availability
             response_data['consumer'] = consumerRequest.consumer.pk
-            response_data['accepted_producer'] = consumerRequest.accepted_producer.pk
-
+            if consumerRequest.accepted_producer != None:
+                response_data['accepted_producer'] = consumerRequest.accepted_producer.pk
+            else:
+                response_data['accepted_producer'] = None
         else:
             response['ok'] = False
 
@@ -634,7 +638,7 @@ def update_consumerRequest(request, consumerRequest_pk):
                     consumer = Consumer.objects.get(pk = int(form.cleaned_data['consumer']))
                     consumerRequest.consumer = consumer
                 if form.cleaned_data['accepted_producer']:
-                    producer = Producer.objects.get(form.cleaned_data['accepted_producer'])
+                    producer = Producer.objects.get(pk = int(form.cleaned_data['accepted_producer']))
                     consumerRequest.accepted_producer = producer
 
                 consumerRequest.save()
@@ -647,7 +651,10 @@ def update_consumerRequest(request, consumerRequest_pk):
                 response_data['timestamp'] = consumerRequest.timestamp
                 response_data['availability'] = consumerRequest.availability
                 response_data['consumer'] = consumerRequest.consumer.pk
-                response_data['accepted_producer'] = consumerRequest.accepted_producer.pk
+                if consumerRequest.accepted_producer != None:
+                    response_data['accepted_producer'] = consumerRequest.accepted_producer.pk
+                else:
+                    response_data['accepted_producer'] = None
 
             else:
                 response['ok'] = False
@@ -658,11 +665,14 @@ def update_consumerRequest(request, consumerRequest_pk):
 
         # The form filled with the consumer's data
         else:
+            accepted_producer = None
+            if consumerRequest.accepted_producer != None:
+                accepted_producer = consumerRequest.accepted_producer.pk
             form = UpdateConsumerRequestForm(
                 initial={'title': consumerRequest.title, 'offered_price': consumerRequest.offered_price,
                          'description': consumerRequest.description, 'timestamp': consumerRequest.timestamp,
                          'availability': consumerRequest.availability, 'consumer': consumerRequest.consumer.pk,
-                         'accepted_producer': consumerRequest.accepted_producer.pk})
+                         'accepted_producer': accepted_producer})
             return render(request, 'update_consumerRequest.html', {'form': form, 'update': True})
 
     except:
