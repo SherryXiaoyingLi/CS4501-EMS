@@ -38,4 +38,6 @@ urlpatterns = [
     url(r'^api/v1/consumerRequests/(?P<consumerRequest_pk>[0-9]+)$', views.get_consumerRequest, name='get_consumerRequest'),
     url(r'^api/v1/consumerRequests/(?P<consumerRequest_pk>[0-9]+)/update$', views.update_consumerRequest, name='update_consumerRequest'),
     url(r'^api/v1/consumerRequests/(?P<consumerRequest_pk>[0-9]+)/delete$', views.delete_consumerRequest, name='delete_consumerRequest'),
+    url(r'^api/v1/consumerRequests/getHighestPrice$', views.getHighestPriceConsumerRequest, name='get_highestPriceConsumerRequest'),
+    url(r'^api/v1/consumerRequests/getNewest$', views.getNewestConsumerRequest, name='get_newestConsumerRequest'),
 ]

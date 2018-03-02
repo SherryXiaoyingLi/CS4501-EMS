@@ -713,3 +713,10 @@ def delete_consumerRequest(request, consumerRequest_pk):
     response['result'] = response_data
     return JsonResponse(response)
 
+def getHighestPriceConsumerRequest(request):
+    response = {}
+    return JsonResponse(response)
+
+def getNewestConsumerRequest(request):
+    response = {}
+    return JsonResponse(response)

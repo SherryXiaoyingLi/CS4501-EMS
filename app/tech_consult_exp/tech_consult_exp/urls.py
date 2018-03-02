@@ -22,4 +22,7 @@ from webapp_exp import views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', views.index, name='index'),
+    url(r'^api/v1/getNewestRequestPk$', views.getNewestRequestPk, name='get_newestRequestPk'),
+    url(r'^api/v1/getHighestRequestPk$', views.getHighestRequestPk, name='get_highestRequestPk'),
+    url(r'^api/v1/requestDetail/(?P<consumerRequest_pk>[0-9]+)$', views.getRequestDetail, name='exp_requestDetail'),
 ]
