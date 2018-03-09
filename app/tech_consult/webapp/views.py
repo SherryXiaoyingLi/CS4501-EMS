@@ -8,6 +8,7 @@ from .models import Consumer, ConsumerRequest, Producer, Review
 from .forms import CreateConsumerForm, CreateProducerForm, CreateReviewForm, CreateConsumerRequestForm
 from .forms import UpdateConsumerForm, UpdateReviewForm, UpdateConsumerRequestForm, UpdateProducerForm
 from django.views.decorators.csrf import csrf_exempt
+from django.db.models import Max
 
 # Create your views here.
 
@@ -715,8 +716,56 @@ def delete_consumerRequest(request, consumerRequest_pk):
 
 def getHighestPriceConsumerRequest(request):
     response = {}
+    response_data = {}
+
+    try:
+        #Finds the highest priced consumer request that is not accepted by a producer
+        consumerRequest = ConsumerRequest.objects.filter(accepted_producer__isnull = True).latest('offered_price')
+        response_data['pk'] = consumerRequest.pk
+        response_data['title'] = consumerRequest.title
+        response_data['offered_price'] = consumerRequest.offered_price
+        response_data['description'] = consumerRequest.description
+        response_data['timestamp'] = consumerRequest.timestamp
+        response_data['availability'] = consumerRequest.availability
+        response_data['consumer'] = consumerRequest.consumer.pk
+
+        if consumerRequest.accepted_producer != None:
+            response_data['accepted_producer'] = consumerRequest.accepted_producer.pk
+        else:
+            response_data['accepted_producer'] = None
+        response['ok'] = True
+
+    except:
+        response['ok'] = False
+
+    response['result'] = response_data
+
     return JsonResponse(response)
 
 def getNewestConsumerRequest(request):
     response = {}
+    response_data = {}
+
+    try:
+        #Finds the newest consumer request that is not accepted by a producer
+        consumerRequest = ConsumerRequest.objects.filter(accepted_producer__isnull = True).last()
+        response_data['pk'] = consumerRequest.pk
+        response_data['title'] = consumerRequest.title
+        response_data['offered_price'] = consumerRequest.offered_price
+        response_data['description'] = consumerRequest.description
+        response_data['timestamp'] = consumerRequest.timestamp
+        response_data['availability'] = consumerRequest.availability
+        response_data['consumer'] = consumerRequest.consumer.pk
+
+        if consumerRequest.accepted_producer != None:
+            response_data['accepted_producer'] = consumerRequest.accepted_producer.pk
+        else:
+            response_data['accepted_producer'] = None
+        response['ok'] = True
+
+    except:
+        response['ok'] = False
+
+    response['result'] = response_data
+
     return JsonResponse(response)
