@@ -6,7 +6,7 @@ import json
 from webapp.models import Consumer, Producer, Review, ConsumerRequest
 
 
-
+#Create your tests here.
 class GetTestCase(TestCase):
     # setUp method is called before each test in this class
 
@@ -92,8 +92,11 @@ class GetTestCase(TestCase):
         #print(response.json()['ok'])
         self.assertFalse(response.json()['ok'])
 
-#Create your tests here.
-class GetCreatedTestCase(TestCase):
+    # tearDown method is called after each test
+    def tearDown(self):
+        pass  # nothing to tear down
+
+class CreatedTestCase(TestCase):
     # setUp method is called before each test in this class
 
     fixtures = ['db.json']
@@ -101,7 +104,7 @@ class GetCreatedTestCase(TestCase):
     def setUp(self):
         pass  # nothing to set up
 
-    def test_get_created_consumer(self):
+    def test_create_consumer(self):
         post_data = {'username': 'marissa', 'password': 'password', 'first_name': 'Marissa', 'last_name': 'Lee', 'email': 'm@gmail.com', 'phone': '111-111-1111'}
 
         # creates the consumer
@@ -116,7 +119,7 @@ class GetCreatedTestCase(TestCase):
         # checks that response contains value with same pk as created
         self.assertEquals(response.json()['result']['pk'], created_pk)
 
-    def test_get_created_producer(self):
+    def test_create_producer(self):
         post_data = {'username': 'megan', 'password': 'supersecret', 'first_name': 'Megan', 'last_name': 'Smith', 'email': 'msmith@hotmail.com', 'phone': '753-123-1254', 'bio': 'I am a senior at GMU.', 'skills': 'web design'}
 
         response = self.client.post(reverse('create_producer'), post_data)
@@ -131,8 +134,8 @@ class GetCreatedTestCase(TestCase):
         # checks that response contains value with same pk as created
         self.assertEquals(response.json()['result']['pk'], created_pk)
 
-    def test_get_created_review(self):
-        post_data = {'producer': 1, 'author': '3', 'rating': 4, 'comment': 'mylee3 got the job done well enough.'}
+    def test_create_review(self):
+        post_data = {'producer': 1, 'author': 3, 'rating': 4, 'comment': 'mylee3 got the job done well enough.'}
 
         response = self.client.post(reverse('create_review'), post_data)
 
@@ -146,7 +149,7 @@ class GetCreatedTestCase(TestCase):
         # checks that response contains value with same pk as created
         self.assertEquals(response.json()['result']['pk'], created_pk)
 
-    def test_get_created_consumer_request_with_producer(self):
+    def test_create_consumer_request_with_producer(self):
         post_data = {'title': 'New to Django', 'offered_price': 100, 'description': 'Django confuses me.  Can somebody teach me?', 'timestamp': 'March 6, 2018.  8:32', 'availability':'Mondays', 'consumer': 4, 'accepted_producer': 1}
 
         response = self.client.post(reverse('create_consumerRequest'), post_data)
@@ -161,7 +164,7 @@ class GetCreatedTestCase(TestCase):
         # checks that response contains value with same pk as created
         self.assertEquals(response.json()['result']['pk'], created_pk)
 
-    def test_get_created_consumer_request_without_producer(self):
+    def test_create_consumer_request_without_producer(self):
         post_data = {'title': 'New to Django', 'offered_price': 100, 'description': 'Django confuses me.  Can somebody teach me?', 'timestamp': 'March 6, 2018.  8:32', 'availability':'Mondays', 'consumer': 4}
 
         response = self.client.post(reverse('create_consumerRequest'), post_data)
@@ -175,6 +178,428 @@ class GetCreatedTestCase(TestCase):
 
         # checks that response contains value with same pk as created
         self.assertEquals(response.json()['result']['pk'], created_pk)
+
+    # tearDown method is called after each test
+    def tearDown(self):
+        pass  # nothing to tear down
+
+class DeleteTestCase(TestCase):
+    # setUp method is called before each test in this class
+
+    fixtures = ['db.json']
+
+    def setUp(self):
+        pass  # nothing to set up
+
+    def test_delete_existing_consumer(self):
+        deleted_pk = 4
+
+        # deletes an existing consumer
+        response = self.client.get(reverse('delete_consumer', kwargs={'consumer_pk': deleted_pk}))
+        #print(response.json()['result'])
+
+        # checks that response does not contain data for deleted consumer
+        response = self.client.get(reverse('get_consumer', kwargs={'consumer_pk': deleted_pk}))
+
+        self.assertFalse(response.json()['ok'])
+
+    def test_delete_nonexisting_consumer(self):
+        deleted_pk = 100
+
+        # attempts to delete a nonexisting consumer
+        response = self.client.get(reverse('delete_consumer', kwargs={'consumer_pk': deleted_pk}))
+        #print(response.json()['result'])
+
+        self.assertFalse(response.json()['ok'])
+
+    def test_delete_existing_producer(self):
+        deleted_pk = 2
+
+        # deletes an existing consumer
+        response = self.client.get(reverse('delete_producer', kwargs={'producer_pk': deleted_pk}))
+        #print(response.json()['result'])
+
+        # checks that response does not contain data for deleted producer
+        response = self.client.get(reverse('get_producer', kwargs={'producer_pk': deleted_pk}))
+
+        self.assertFalse(response.json()['ok'])
+
+    def test_delete_nonexisting_producer(self):
+        deleted_pk = 100
+
+        # attempts to delete a nonexisting producer
+        response = self.client.get(reverse('delete_producer', kwargs={'producer_pk': deleted_pk}))
+        #print(response.json()['result'])
+
+        self.assertFalse(response.json()['ok'])
+
+    def test_delete_existing_review(self):
+        deleted_pk = 1
+
+        # deletes an existing review
+        response = self.client.get(reverse('delete_review', kwargs={'review_pk': deleted_pk}))
+        #print(response.json()['result'])
+
+        # checks that response does not contain data for deleted review
+        response = self.client.get(reverse('get_review', kwargs={'review_pk': deleted_pk}))
+
+        self.assertFalse(response.json()['ok'])
+
+    def test_delete_nonexisting_review(self):
+        deleted_pk = 100
+
+        # attempts to delete a nonexisting review
+        response = self.client.get(reverse('delete_review', kwargs={'review_pk': deleted_pk}))
+        #print(response.json()['result'])
+
+        self.assertFalse(response.json()['ok'])
+
+    def test_delete_existing_consumer_request(self):
+        deleted_pk = 1
+
+        # deletes an existing consumer request
+        response = self.client.get(reverse('delete_consumerRequest', kwargs={'consumerRequest_pk': deleted_pk}))
+        #print(response.json()['result'])
+
+        # checks that response does not contain data for deleted consumer request
+        response = self.client.get(reverse('get_consumerRequest', kwargs={'consumerRequest_pk': deleted_pk}))
+
+        self.assertFalse(response.json()['ok'])
+
+    def test_delete_nonexisting_consumer_request(self):
+        deleted_pk = 100
+
+        # attempts to delete a nonexisting consumer request
+        response = self.client.get(reverse('delete_consumerRequest', kwargs={'consumerRequest_pk': deleted_pk}))
+        #print(response.json()['result'])
+
+        self.assertFalse(response.json()['ok'])
+
+    # tearDown method is called after each test
+    def tearDown(self):
+        pass  # nothing to tear down
+
+class UpdateTestCase(TestCase):
+    # setUp method is called before each test in this class
+
+    fixtures = ['db.json']
+
+    def setUp(self):
+
+        pass  # nothing to set up
+
+    def test_update_consumer_all_fields(self):
+
+        pk=3
+
+        post_data = {'username': 'marissa', 'password': 'password', 'first_name': 'Marissa', 'last_name': 'Lee',
+                     'email': 'm@gmail.com', 'phone': '111-111-1111'}
+
+        #response = self.client.get(reverse('get_consumer', kwargs={'consumer_pk': pk}))
+        #print(response.json()['result'])
+
+        response = self.client.post(reverse('update_consumer', kwargs={'consumer_pk': pk}), post_data)
+
+        #print(response.json()['result'])
+
+        #Adding pk to the post_data
+        original_data = post_data
+        original_data['pk'] = pk
+        #print(original_data)
+
+        #Checks that the updated data is the same as the posted data
+        results = response.json()['result']
+
+        self.assertEquals(original_data, results)
+
+    def test_update_consumer_one_field(self):
+        pk = 3
+
+        password = "new_password"
+
+        post_data = {'password': password}
+
+        # Getting the data before the update for comparison
+        response = self.client.get(reverse('get_consumer', kwargs={'consumer_pk': pk}))
+        original_data = response.json()['result']
+
+        # Adding the pk and updated password to original_data
+        original_data['pk'] = pk
+        original_data['password'] = password
+        # print(original_data)
+
+        response = self.client.post(reverse('update_consumer', kwargs={'consumer_pk': pk}), post_data)
+
+        # print(response.json()['result'])
+
+        # Checks that only the password of the updated data is affected
+        results = response.json()['result']
+
+        self.assertEquals(original_data, results)
+
+    def test_update_producer_all_fields(self):
+
+        pk=2
+
+        post_data = {'username': 'megan', 'password': 'supersecret', 'first_name': 'Megan', 'last_name': 'Smith',
+                     'email': 'msmith@hotmail.com', 'phone': '753-123-1254', 'bio': 'I am a senior at GMU.',
+                     'skills': 'web design'}
+
+        #response = self.client.get(reverse('get_producer', kwargs={'producer_pk': pk}))
+        #print(response.json()['result'])
+
+        response = self.client.post(reverse('update_producer', kwargs={'producer_pk': pk}), post_data)
+
+        #print(response.json()['result'])
+
+        #Adding pk to the post_data
+        original_data = post_data
+        original_data['pk'] = pk
+        #print(original_data)
+
+        #Checks that the updated data is the same as the posted data
+        results = response.json()['result']
+
+        self.assertEquals(original_data, results)
+
+    def test_update_producer_one_field(self):
+        pk = 2
+
+        password = "new_password"
+
+        post_data = {'password': password}
+
+        # Getting the data before the update for comparison
+        response = self.client.get(reverse('get_producer', kwargs={'producer_pk': pk}))
+        original_data = response.json()['result']
+
+        # Adding the pk and updated password to original_data
+        original_data['pk'] = pk
+        original_data['password'] = password
+        # print(original_data)
+
+        response = self.client.post(reverse('update_producer', kwargs={'producer_pk': pk}), post_data)
+
+        # print(response.json()['result'])
+
+        # Checks that only the password of the updated data is affected
+        results = response.json()['result']
+
+        self.assertEquals(original_data, results)
+
+    def test_update_review_all_fields(self):
+
+        pk=1
+
+        post_data = {'producer': 1, 'author': 3, 'rating': 4, 'comment': 'mylee3 got the job done well enough.'}
+
+        #response = self.client.get(reverse('get_review', kwargs={'review_pk': pk}))
+        #print(response.json()['result'])
+
+        response = self.client.post(reverse('update_review', kwargs={'review_pk': pk}), post_data)
+
+        #print(response.json()['result'])
+
+        #Adding pk to the post_data
+        original_data = post_data
+        original_data['pk'] = pk
+        #print(original_data)
+
+        #Checks that the updated data is the same as the posted data
+        results = response.json()['result']
+
+        self.assertEquals(original_data, results)
+
+    def test_update_review_all_nonforeign_fields(self):
+
+        pk=1
+
+        #User does not change author nor producer
+        post_data = {'rating': 4, 'comment': 'mylee3 got the job done well enough.'}
+
+        response = self.client.get(reverse('get_review', kwargs={'review_pk': pk}))
+        original_data = response.json()['result']
+
+        # Adding the pk, rating, and comment to original_data
+        original_data['pk'] = pk
+        original_data['rating'] = post_data['rating']
+        original_data['comment'] = post_data['comment']
+        # print(original_data)
+
+        response = self.client.post(reverse('update_review', kwargs={'review_pk': pk}), post_data)
+
+        #print(response.json()['result'])
+
+        #Checks that the updated data is the same as the posted data
+        results = response.json()['result']
+
+        self.assertEquals(original_data, results)
+
+    def test_update_review_one_field(self):
+        pk = 1
+
+        rating = 4
+
+        post_data = {'rating': rating}
+
+        # Getting the data before the update for comparison
+        response = self.client.get(reverse('get_review', kwargs={'review_pk': pk}))
+        original_data = response.json()['result']
+
+        # Adding the pk and updated rating to original_data
+        original_data['pk'] = pk
+        original_data['rating'] = rating
+        # print(original_data)
+
+        response = self.client.post(reverse('update_review', kwargs={'review_pk': pk}), post_data)
+
+        # print(response.json()['result'])
+
+        # Checks that only the rating of the updated data is affected
+        results = response.json()['result']
+
+        self.assertEquals(original_data, results)
+
+    def test_update_consumer_request_all_fields(self):
+
+        pk=1
+
+        post_data = {'title': 'New to Django', 'offered_price': 100,
+                     'description': 'Django confuses me.  Can somebody teach me?', 'timestamp': 'March 6, 2018.  8:32',
+                     'availability': 'Mondays', 'consumer': 4, 'accepted_producer': 1}
+
+        #response = self.client.get(reverse('get_consumerRequest', kwargs={'consumerRequest_pk': pk}))
+        #print(response.json()['result'])
+
+        response = self.client.post(reverse('update_consumerRequest', kwargs={'consumerRequest_pk': pk}), post_data)
+
+        #print(response.json()['result'])
+
+        #Adding pk to the post_data
+        original_data = post_data
+        original_data['pk'] = pk
+        #print(original_data)
+
+        #Checks that the updated data is the same as the posted data
+        results = response.json()['result']
+
+        self.assertEquals(original_data, results)
+
+    def test_update_consumerRequest_all_nonforeign_fields(self):
+
+        pk=3
+
+        #User does not change consumer nor accepted_producer
+        post_data = {'title': 'New to Django', 'offered_price': 100,
+                     'description': 'Django confuses me.  Can somebody teach me?', 'timestamp': 'March 6, 2018.  8:32',
+                     'availability': 'Mondays'}
+
+        response = self.client.get(reverse('get_consumerRequest', kwargs={'consumerRequest_pk': pk}))
+        original_data = response.json()['result']
+
+        # Adding the pk, rating, and comment to original_data
+        original_data['pk'] = pk
+        original_data['title'] = post_data['title']
+        original_data['offered_price'] = post_data['offered_price']
+        original_data['description'] = post_data['description']
+        original_data['timestamp'] = post_data['timestamp']
+        original_data['availability'] = post_data['availability']
+        # print(original_data)
+
+        response = self.client.post(reverse('update_consumerRequest', kwargs={'consumerRequest_pk': pk}), post_data)
+
+        #print(response.json()['result'])
+
+        #Checks that the updated data is the same as the posted data
+        results = response.json()['result']
+
+        self.assertEquals(original_data, results)
+
+    def test_update_consumerRequest_one_field(self):
+        pk = 3
+
+        title = "Still need help"
+
+        post_data = {'title': title}
+
+        # Getting the data before the update for comparison
+        response = self.client.get(reverse('get_consumerRequest', kwargs={'consumerRequest_pk': pk}))
+        original_data = response.json()['result']
+
+        # Adding the pk and updated title to original_data
+        original_data['pk'] = pk
+        original_data['title'] = title
+        # print(original_data)
+
+        response = self.client.post(reverse('update_consumerRequest', kwargs={'consumerRequest_pk': pk}), post_data)
+
+        # print(response.json()['result'])
+
+        # Checks that only the rating of the updated data is affected
+        results = response.json()['result']
+
+        self.assertEquals(original_data, results)
+
+    # tearDown method is called after each test
+    def tearDown(self):
+        pass  # nothing to tear down
+
+class NewestConsumerRequestTestCase(TestCase):
+    # setUp method is called before each test in this class
+
+    fixtures = ['db.json']
+
+    def setUp(self):
+
+        pass  # nothing to set up
+
+    def test_newest_consumer_request(self):
+
+        response = self.client.get(reverse('get_newestConsumerRequest'))
+        #print(response.json()['result'])
+
+        newest_pk = response.json()['result']['pk']
+
+        all_consumer_requests = ConsumerRequest.objects.all()
+
+        # Manually checking for newest consumer request without an accepted_producer
+        consumer_request = all_consumer_requests.first()
+        for cr in all_consumer_requests:
+            if cr.accepted_producer is None:
+                consumer_request = cr
+
+        last_pk = consumer_request.pk
+
+        # compares the manually checked newest request with the microservice's newest request
+        self.assertEquals(newest_pk, last_pk)
+
+class HighestPriceConsumerRequestTestCase(TestCase):
+    # setUp method is called before each test in this class
+
+    fixtures = ['db.json']
+
+    def setUp(self):
+
+        pass  # nothing to set up
+
+    def test_highest_price_consumer_request(self):
+
+        response = self.client.get(reverse('get_highestPriceConsumerRequest'))
+        # print(response.json()['result'])
+
+        highest_price = response.json()['result']['offered_price']
+
+        all_consumer_requests = ConsumerRequest.objects.all()
+
+        # Manually checking for highest priced consumer request without an accepted_producer
+        consumer_request = all_consumer_requests.first()
+        max_price = 0
+        for cr in all_consumer_requests:
+            if cr.accepted_producer is None and cr.offered_price > max_price:
+                max_price = cr.offered_price
+
+        # compares the manually checked highest price with the microservice's highest price
+        self.assertEquals(highest_price, max_price)
 
     # tearDown method is called after each test
     def tearDown(self):
