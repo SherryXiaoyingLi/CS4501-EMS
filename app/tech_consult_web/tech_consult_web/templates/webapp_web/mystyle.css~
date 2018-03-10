@@ -1,0 +1,11 @@
+body {
+    background-image:url("pic.jpg");
+}
+
+h1 {
+    background-color:DodgerBlue;
+    color: white;
+    text-align:center;
+    font-family:Georgia;
+    font-size:40px
+}
