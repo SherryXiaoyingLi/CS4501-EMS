@@ -1,0 +1,61 @@
+body {
+    background-image:url("timg.jpg");
+}
+
+h1 {
+    color: black;
+    text-align:center;
+    font-family:Times;
+    font-size:40px
+}
+h2{
+    color: black;
+    font-family:Times;
+    font-size:15px;
+    text-align:center;
+}
+h3{
+    color:black;
+    font-family:Times;
+    font-size:22px;
+}
+h4{
+    color:black;
+    font-family:Times;
+    font-size:20px;
+    text-align:center;
+}
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    width: 200px;
+    background-color: blue;
+    border: 1px solid #555;
+}
+
+li a {
+    display: block;
+    color: grey;
+    padding: 8px 16px;
+    text-decoration: none;
+}
+
+li {
+    text-align: center;
+    border-bottom: 1px solid #555;
+}
+
+li:last-child {
+    border-bottom: none;
+}
+
+li a.active {
+    background-color: grey;
+    color: white;
+}
+
+li a:hover:not(.active) {
+    background-color: grey;
+    color: white;
+}

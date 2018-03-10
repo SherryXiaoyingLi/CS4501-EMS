@@ -1,11 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="mystyle.css">     
     <title>Technology Consult</title>
 </head>
 <body>
-    <h1>Technology Consult</h1>
-    <h2>Request Detail Page</h2>
+    <h1>Request Details</h1>
+<h4>
+    <p>Title: {{context_dict.title}}</p>
+    <p>Description: {{context_dict.description}} </p>
+    <p>Offered Price: {{context_dict.offered_price}}</p>
+    <p>Timestamp:{{context_dict.timestamp}} </p>
+    <p>Consumer Username:{{context_dict.consumer_username}}</p>
+    <p>Consumer Email:{{context_dict.consumer_email}}</p>
+    <p>Consumer Phone:{{context_dict.consumer_phone}}</p>
+    <p>Availability: {{context_dict.availability}} </p>
+    <p>Accepted Consultant Username(if any):{{context_dict.producer_username}}</p>
+</h4>
 </body>
 </html>

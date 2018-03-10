@@ -1,16 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="mystyle.css">
 
     <title>Technology Consultation</title>
 </head>
+
 <body>
     <h1>Technology Consultation</h1>
+    <h2>CS 4501. Elliott Kim, Marissa Lee, Sherry Li</h2>
+    <li><a href="/request_detail/{{ context_dict.highest_pk }}/"><h3>Highest Offers</h3></a></li>
+    <li><a href="/request_detail/{{ context_dict.newest_pk }}/"><h3>Newest Consumer Requests</h3></a></li>
+  
 
-    <h3>Latest Requests:</h3>
-    <footer>CS 4501. Elliott Kim, Marissa Lee, Sherry Li</footer>
-</body>
+    </body>
 </html>
