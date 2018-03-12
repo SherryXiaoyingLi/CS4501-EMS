@@ -704,7 +704,11 @@ def delete_consumerRequest(request, consumerRequest_pk):
         response_data['timestamp'] = consumerRequest.timestamp
         response_data['availability'] = consumerRequest.availability
         response_data['consumer'] = consumerRequest.consumer.pk
-        response_data['accepted_producer'] = consumerRequest.accepted_producer.pk
+
+        if consumerRequest.accepted_producer != None:
+            response_data['accepted_producer'] = consumerRequest.accepted_producer.pk
+        else:
+            response_data['accepted_producer'] = None
 
         consumerRequest.delete()
 
