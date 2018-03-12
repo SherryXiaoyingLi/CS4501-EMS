@@ -18,18 +18,17 @@ def index(request):
 def getNewestRequestPk(request):
     response = {}
     response_data = {}
-    if request.method == 'GET':
-        try:
-            req = urllib.request.Request('http://models-api:8000/api/v1/consumerRequests/getNewest')
-            resp_json = urllib.request.urlopen(req).read().decode('utf-8')
-            results = json.loads(resp_json)
-            newest_pk = results["result"]["pk"]
-            response["ok"] = True
-            response_data["pk"] = newest_pk
-        except:
-            response["ok"] = False
+    try:
+        req = urllib.request.Request('http://models-api:8000/api/v1/consumerRequests/getNewest')
+        resp_json = urllib.request.urlopen(req).read().decode('utf-8')
+        results = json.loads(resp_json)
+        newest_pk = results["result"]["pk"]
+        response["ok"] = True
+        response_data["pk"] = newest_pk
+    except:
+        response["ok"] = False
 
-        response['result'] = response_data
+    response['result'] = response_data
     return JsonResponse(response)
 
 # For index page
@@ -37,18 +36,17 @@ def getNewestRequestPk(request):
 def getHighestRequestPk(request):
     response = {}
     response_data = {}
-    if request.method == 'GET':
-        try:
-            req = urllib.request.Request('http://models-api:8000/api/v1/consumerRequests/getHighestPrice')
-            resp_json = urllib.request.urlopen(req).read().decode('utf-8')
-            results = json.loads(resp_json)
-            newest_pk = results["result"]["pk"]
-            response["ok"] = True
-            response_data["pk"] = newest_pk
-        except:
-            response["ok"] = False
+    try:
+        req = urllib.request.Request('http://models-api:8000/api/v1/consumerRequests/getHighestPrice')
+        resp_json = urllib.request.urlopen(req).read().decode('utf-8')
+        results = json.loads(resp_json)
+        newest_pk = results["result"]["pk"]
+        response["ok"] = True
+        response_data["pk"] = newest_pk
+    except:
+        response["ok"] = False
 
-        response['result'] = response_data
+    response['result'] = response_data
     return JsonResponse(response)
 
 # For request detail page
