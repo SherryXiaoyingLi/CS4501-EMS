@@ -21,14 +21,17 @@ def index(request):
     resp_json = urllib.request.urlopen(req).read().decode('utf-8')
     resp = json.loads(resp_json)
     print(resp)
-    context_dict['newest_pk'] = resp['result']['pk']
 
-    req = urllib.request.Request('http://exp-api:8000/api/v1/getHighestRequestPk')
+    if resp['ok']:
 
-    resp_json = urllib.request.urlopen(req).read().decode('utf-8')
-    resp = json.loads(resp_json)
-    print(resp)
-    context_dict['highest_pk'] = resp['result']['pk']
+        context_dict['newest_pk'] = resp['result']['pk']
+
+        req = urllib.request.Request('http://exp-api:8000/api/v1/getHighestRequestPk')
+
+        resp_json = urllib.request.urlopen(req).read().decode('utf-8')
+        resp = json.loads(resp_json)
+        print(resp)
+        context_dict['highest_pk'] = resp['result']['pk']
 
     return render(request, "index.html", context_dict)
 
