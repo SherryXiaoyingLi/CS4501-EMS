@@ -4,11 +4,17 @@ from django.shortcuts import render_to_response
 import json
 from django.http import HttpResponse
 from django.http import JsonResponse
-from .models import Consumer, ConsumerRequest, Producer, Review
-from .forms import CreateConsumerForm, CreateProducerForm, CreateReviewForm, CreateConsumerRequestForm
+from .models import Consumer, ConsumerRequest, Producer, Review, Authenticator
+from .forms import CreateConsumerForm, CreateProducerForm, CreateReviewForm, CreateConsumerRequestForm, CreateAuthenticatorForm, EnterAuthenticatorForm, LoginForm
 from .forms import UpdateConsumerForm, UpdateReviewForm, UpdateConsumerRequestForm, UpdateProducerForm
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Max
+from django.conf import settings
+import datetime
+import os
+import hmac
+import urllib.request
+import urllib.parse
 
 # Create your views here.
 
@@ -537,7 +543,6 @@ def get_consumerRequest(request, consumerRequest_pk):
             response_data['title'] = consumerRequest.title
             response_data['offered_price'] = consumerRequest.offered_price
             response_data['description'] = consumerRequest.description
-            response_data['timestamp'] = consumerRequest.timestamp
             response_data['availability'] = consumerRequest.availability
             response_data['consumer'] = consumerRequest.consumer.pk
             if consumerRequest.accepted_producer != None:
@@ -568,10 +573,10 @@ def create_consumerRequest(request):
 
             # Creating the consumer based on form input
             consumerRequest = ConsumerRequest()
+            consumerRequest.timestamp = datetime.date.today().strftime("%B %d, %Y")
             consumerRequest.title = form.cleaned_data['title']
             consumerRequest.offered_price = float(form.cleaned_data['offered_price'])
             consumerRequest.description = form.cleaned_data['description']
-            consumerRequest.timestamp = form.cleaned_data['timestamp']
             consumerRequest.availability = form.cleaned_data['availability']
             consumer = Consumer.objects.get(pk = int(form.cleaned_data['consumer']))
             consumerRequest.consumer = consumer
@@ -634,8 +639,6 @@ def update_consumerRequest(request, consumerRequest_pk):
                     consumerRequest.offered_price = float(form.cleaned_data['offered_price'])
                 if form.cleaned_data['description']:
                     consumerRequest.description = form.cleaned_data['description']
-                if form.cleaned_data['timestamp']:
-                    consumerRequest.timestamp = form.cleaned_data['timestamp']
                 if form.cleaned_data['availability']:
                     consumerRequest.availability = form.cleaned_data['availability']
                 if form.cleaned_data['consumer']:
@@ -772,4 +775,187 @@ def getNewestConsumerRequest(request):
 
     response['result'] = response_data
 
+    return JsonResponse(response)
+
+@csrf_exempt
+def create_authenticator (request):
+    response = {}
+    response_data = {}
+    try:
+        if request.method == 'POST':
+            form = CreateAuthenticatorForm(request.POST)
+
+            if form.is_valid():
+
+                response['ok'] = True
+
+                # Creating the authenticator based on form input
+                auth_obj = Authenticator()
+                auth_obj.user_id = form.cleaned_data['user_id']
+                auth_obj.is_consumer = form.cleaned_data['is_consumer']
+
+                #Check that user exists
+                if auth_obj.is_consumer:
+                    user = Consumer.objects.get(pk=auth_obj.user_id)
+                else:
+                    user = Producer.objects.get(pk=auth_obj.user_id)
+
+                auth_obj.date_created = datetime.date.today().strftime("%B %d, %Y")
+                unique = False
+                while not unique:
+                    auth = hmac.new(
+                        key=settings.SECRET_KEY.encode('utf-8'),
+                        msg=os.urandom(32),
+                        digestmod='sha256',
+                    ).hexdigest()
+
+                    try:
+                        a = Authenticator.objects.get(authenticator = auth)
+                    except Authenticator.DoesNotExist:
+                        unique = True
+
+                auth_obj.authenticator = auth
+                auth_obj.save()
+
+                # Adding the created consumer's data to json response
+                response_data['user_id'] = auth_obj.user_id
+                response_data['is_consumer'] = auth_obj.is_consumer
+                response_data['authenticator'] = auth_obj.authenticator
+                response_data['date_created'] = auth_obj.date_created
+            else:
+                response['ok'] = False
+
+            response['result'] = response_data
+
+            return JsonResponse(response)
+
+
+        else:
+            # An unfilled form gets displayed
+            form = CreateAuthenticatorForm()
+            return render(request, 'create_authenticator.html', {'form': form, 'title': 'Create Authenticator'})
+    except:
+        response['ok'] = False
+
+        response['result'] = response_data
+
+
+    return JsonResponse(response)
+
+@csrf_exempt
+def delete_authenticator(request):
+
+    response = {}
+    response_data = {}
+    try:
+        if request.method == 'POST':
+            form = EnterAuthenticatorForm(request.POST)
+
+            if form.is_valid():
+                response['ok'] = True
+
+                auth_obj = Authenticator.objects.get(authenticator=form.cleaned_data["authenticator"])
+                response_data['user_id'] = auth_obj.user_id
+                response_data['is_consumer'] = auth_obj.is_consumer
+                response_data['authenticator'] = auth_obj.authenticator
+                response_data['date_created'] = auth_obj.date_created
+
+                auth_obj.delete()
+            else:
+                response['ok'] = False
+
+        else:
+            # An unfilled form gets displayed
+            form = EnterAuthenticatorForm()
+            return render(request, 'create_authenticator.html', {'form': form, 'title': 'Delete Authenticator'})
+    except:
+        response['ok'] = False
+
+    response['result'] = response_data
+    return JsonResponse(response)
+
+@csrf_exempt
+def login(request):
+    response = {}
+    response_data = {}
+    try:
+        if request.method == 'POST':
+            form = LoginForm(request.POST)
+
+            if form.is_valid():
+
+                response['ok'] = True
+
+                # Creating the authenticator based on form input
+                username = form.cleaned_data['username']
+                password = form.cleaned_data['password']
+                is_consumer = form.cleaned_data['is_consumer']
+
+                #Check that user with password exists
+                if is_consumer:
+                    user = Consumer.objects.get(username=username, password=password)
+                else:
+                    user = Producer.objects.get(username=username, password=password)
+                user_id = user.pk
+
+                post_data = {'user_id': user_id, 'is_consumer': is_consumer}
+
+                post_encoded = urllib.parse.urlencode(post_data).encode('utf-8')
+                req = urllib.request.Request('http://localhost:8000/api/v1/authenticators/create', data=post_encoded, method='POST')
+
+                resp_json = urllib.request.urlopen(req).read().decode('utf-8')
+                resp = json.loads(resp_json)
+
+                if resp['ok']:
+                    response['ok'] = True
+                    # Adding the created authenticator's data to json response
+                    response_data['result'] = resp['result']
+            else:
+                response['ok'] = False
+
+            response['result'] = response_data
+
+            return JsonResponse(response)
+
+        else:
+            # An unfilled form gets displayed
+            form = LoginForm()
+            return render(request, 'create_authenticator.html', {'form': form, 'title': 'Login'})
+    except:
+        response['ok'] = False
+
+        response['result'] = response_data
+
+
+    return JsonResponse(response)
+
+@csrf_exempt
+def validate(request):
+
+    response = {}
+    response_data = {}
+    try:
+        if request.method == 'POST':
+            form = EnterAuthenticatorForm(request.POST)
+
+            if form.is_valid():
+
+                auth_obj = Authenticator.objects.get(authenticator=form.cleaned_data["authenticator"])
+                response['ok'] = True
+                response_data['user_id'] = auth_obj.user_id
+                response_data['is_consumer'] = auth_obj.is_consumer
+                response_data['authenticator'] = auth_obj.authenticator
+                response_data['date_created'] = auth_obj.date_created
+
+            else:
+                response['ok'] = False
+
+        else:
+            # An unfilled form gets displayed
+            form = EnterAuthenticatorForm()
+            return render(request, 'create_authenticator.html', {'form': form, 'title': 'Validate'})
+    except:
+        response['ok'] = False
+
+    response['result'] = response_data
     return JsonResponse(response)

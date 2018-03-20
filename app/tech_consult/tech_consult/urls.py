@@ -40,4 +40,8 @@ urlpatterns = [
     url(r'^api/v1/consumerRequests/(?P<consumerRequest_pk>[0-9]+)/delete$', views.delete_consumerRequest, name='delete_consumerRequest'),
     url(r'^api/v1/consumerRequests/getHighestPrice$', views.getHighestPriceConsumerRequest, name='get_highestPriceConsumerRequest'),
     url(r'^api/v1/consumerRequests/getNewest$', views.getNewestConsumerRequest, name='get_newestConsumerRequest'),
+    url(r'^api/v1/authenticators/create$', views.create_authenticator, name='create_authenticator'),
+    url(r'^api/v1/authenticators/delete$', views.delete_authenticator, name='delete_authenticator'),
+    url(r'^api/v1/login$', views.login, name='login'),
+    url(r'^api/v1/authenticators/validate$', views.validate, name='validate'),
 ]
