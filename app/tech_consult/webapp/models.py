@@ -30,7 +30,7 @@ class Producer(models.Model):
         return "%s" % (self.username)
 
 class Review(models.Model):
-    rating = models.IntegerField(default = 1)
+    rating = models.IntegerField(default=1)
     comment = models.CharField(max_length=150, default="none")
     producer = models.ForeignKey(Producer, default=1)
     author = models.ForeignKey(Consumer, default=1)
@@ -49,3 +49,10 @@ class ConsumerRequest(models.Model):
 
 #  def __str__(self):
 #       return self.description
+
+class Authenticator(models.Model):
+    authenticator = models.CharField(max_length=255, primary_key=True)
+    #Using user_id and is_consumer for Consumer and Producer models
+    user_id = models.IntegerField(default=0)
+    is_consumer = models.BooleanField(default=True)
+    date_created = models.CharField(max_length=50)

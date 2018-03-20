@@ -68,7 +68,6 @@ class CreateConsumerRequestForm(forms.Form):
     title = forms.CharField(max_length=200, help_text="Title: ")
     offered_price = forms.FloatField(help_text="Offered Price: ")
     description = forms.CharField(max_length=200, help_text="Description: ")
-    timestamp = forms.CharField(max_length=200, help_text="Timestamp: ")
     availability = forms.CharField(max_length=200, help_text="Availability: ")
     consumer = forms.IntegerField(help_text="Consumer PK: ")
     accepted_producer = forms.IntegerField(help_text="Producer PK: ", required=False)
@@ -82,3 +81,18 @@ class UpdateConsumerRequestForm(forms.Form):
     availability = forms.CharField(max_length=200, help_text="Availability: ", required=False)
     consumer = forms.IntegerField(help_text="Consumer PK: ", required=False)
     accepted_producer = forms.IntegerField(help_text="Producer PK: ", required=False)
+
+# Form to create an authenticator
+class CreateAuthenticatorForm(forms.Form):
+    user_id = forms.IntegerField(help_text="User id: ")
+    is_consumer = forms.BooleanField(required = False)
+
+# Form to delete an authenticator
+class EnterAuthenticatorForm(forms.Form):
+    authenticator = forms.CharField(max_length=256, help_text="Authenticator: ")
+
+#Form to login
+class LoginForm(forms.Form):
+    username = forms.CharField(max_length=200, help_text="Username: ")
+    password = forms.CharField(max_length=200, help_text="Password: ")
+    is_consumer = forms.BooleanField(required=False)
