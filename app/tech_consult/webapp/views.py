@@ -4,6 +4,7 @@ from django.shortcuts import render_to_response
 import json
 from django.http import HttpResponse
 from django.http import JsonResponse
+from django.contrib.auth.hashers import make_password, check_password
 from .models import Consumer, ConsumerRequest, Producer, Review, Authenticator
 from .forms import CreateConsumerForm, CreateProducerForm, CreateReviewForm, CreateConsumerRequestForm, CreateAuthenticatorForm, EnterAuthenticatorForm, LoginForm
 from .forms import UpdateConsumerForm, UpdateReviewForm, UpdateConsumerRequestForm, UpdateProducerForm
@@ -72,7 +73,8 @@ def create_consumer (request):
                 # Creating the consumer based on form input
                 consumer = Consumer()
                 consumer.username = form.cleaned_data['username']
-                consumer.password = form.cleaned_data['password']
+                password = form.cleaned_data['password']
+                consumer.password = make_password(password, salt=None, hasher='default')
                 consumer.first_name = form.cleaned_data['first_name']
                 consumer.last_name = form.cleaned_data['last_name']
                 consumer.phone = form.cleaned_data['phone']
@@ -129,7 +131,8 @@ def update_consumer (request, consumer_pk):
                 if form.cleaned_data['username']:
                     consumer.username = form.cleaned_data['username']
                 if form.cleaned_data['password']:
-                    consumer.password = form.cleaned_data['password']
+                    password = form.cleaned_data['password']
+                    consumer.password = make_password(password, salt=None, hasher='default')
                 if form.cleaned_data['first_name']:
                     consumer.first_name = form.cleaned_data['first_name']
                 if form.cleaned_data['last_name']:
@@ -159,7 +162,7 @@ def update_consumer (request, consumer_pk):
 
         # The form filled with the consumer's data
         else:
-            form = UpdateConsumerForm(initial={'username':consumer.username, 'password': consumer.password, 'first_name': consumer.first_name, 'last_name': consumer.last_name, 'phone': consumer.phone, 'email': consumer.email})
+            form = UpdateConsumerForm(initial={'username':consumer.username, 'first_name': consumer.first_name, 'last_name': consumer.last_name, 'phone': consumer.phone, 'email': consumer.email})
             return render(request, 'update_consumer.html', {'form': form, 'update': True})
 
     except:
@@ -240,7 +243,8 @@ def create_producer (request):
             # Creating the producer based on form input
             producer = Producer()
             producer.username = form.cleaned_data['username']
-            producer.password = form.cleaned_data['password']
+            password = form.cleaned_data['password']
+            producer.password = make_password(password, salt=None, hasher='default')
             producer.first_name = form.cleaned_data['first_name']
             producer.last_name = form.cleaned_data['last_name']
             producer.phone = form.cleaned_data['phone']
@@ -298,7 +302,8 @@ def update_producer (request, producer_pk):
                 if form.cleaned_data['username']:
                     producer.username = form.cleaned_data['username']
                 if form.cleaned_data['password']:
-                    producer.password = form.cleaned_data['password']
+                    password = form.cleaned_data['password']
+                    producer.password = make_password(password, salt=None, hasher='default')
                 if form.cleaned_data['first_name']:
                     producer.first_name = form.cleaned_data['first_name']
                 if form.cleaned_data['last_name']:
@@ -334,7 +339,7 @@ def update_producer (request, producer_pk):
 
         # The form filled with the producer's data
         else:
-            form = UpdateProducerForm(initial={'username':producer.username, 'password': producer.password, 'first_name': producer.first_name, 'last_name': producer.last_name, 'phone': producer.phone, 'email': producer.email})
+            form = UpdateProducerForm(initial={'username':producer.username, 'first_name': producer.first_name, 'last_name': producer.last_name, 'phone': producer.phone, 'email': producer.email, 'bio': producer.bio, 'skills': producer.skills})
             return render(request, 'update_producer.html', {'form': form, 'update': True})
 
     except:
@@ -893,23 +898,28 @@ def login(request):
 
                 #Check that user with password exists
                 if is_consumer:
-                    user = Consumer.objects.get(username=username, password=password)
+                    user = Consumer.objects.get(username=username)
                 else:
-                    user = Producer.objects.get(username=username, password=password)
-                user_id = user.pk
+                    user = Producer.objects.get(username=username)
+                if check_password(password, user.password):
+                    user_id = user.pk
 
-                post_data = {'user_id': user_id, 'is_consumer': is_consumer}
+                    post_data = {'user_id': user_id, 'is_consumer': is_consumer}
 
-                post_encoded = urllib.parse.urlencode(post_data).encode('utf-8')
-                req = urllib.request.Request('http://localhost:8000/api/v1/authenticators/create', data=post_encoded, method='POST')
+                    post_encoded = urllib.parse.urlencode(post_data).encode('utf-8')
+                    req = urllib.request.Request('http://localhost:8000/api/v1/authenticators/create', data=post_encoded, method='POST')
 
-                resp_json = urllib.request.urlopen(req).read().decode('utf-8')
-                resp = json.loads(resp_json)
+                    resp_json = urllib.request.urlopen(req).read().decode('utf-8')
+                    resp = json.loads(resp_json)
 
-                if resp['ok']:
-                    response['ok'] = True
-                    # Adding the created authenticator's data to json response
-                    response_data['result'] = resp['result']
+                    if resp['ok']:
+                        response['ok'] = True
+                        # Adding the created authenticator's data to json response
+                        response_data['result'] = resp['result']
+                    else:
+                        response['ok'] = False
+                else:
+                    response['ok'] = False
             else:
                 response['ok'] = False
 
