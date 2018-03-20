@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 
 class Consumer(models.Model):
     username = models.CharField(max_length=200, default="none", unique=True)
-    password = models.CharField(max_length=200, default="none")
+    password = models.CharField(max_length=500, default="none")
     first_name = models.CharField(max_length=200, default="none")
     last_name = models.CharField(max_length=200, default="none")
     phone = models.CharField(max_length=200, default="none")
@@ -17,7 +17,7 @@ class Consumer(models.Model):
 
 class Producer(models.Model):
     username = models.CharField(max_length=200, default="none", unique=True)
-    password = models.CharField(max_length=200, default="none")
+    password = models.CharField(max_length=500, default="none")
     first_name = models.CharField(max_length=200, default="none")
     last_name = models.CharField(max_length=200, default="none")
     phone = models.CharField(max_length=200, default="none")

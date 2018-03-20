@@ -4,7 +4,7 @@ import urllib.request
 import urllib.parse
 import json
 from webapp.models import Consumer, Producer, Review, ConsumerRequest
-
+from django.contrib.auth.hashers import make_password, check_password
 
 #Create your tests here.
 class GetTestCase(TestCase):
@@ -309,23 +309,23 @@ class UpdateTestCase(TestCase):
 
         #Checks that the updated data is the same as the posted data
         results = response.json()['result']
-
+        original_data['password'] = response.json()['result']['password']
         self.assertEquals(original_data, results)
 
     def test_update_consumer_one_field(self):
         pk = 3
 
-        password = "new_password"
+        email = "kellym@gmail.com"
 
-        post_data = {'password': password}
+        post_data = {'email': email}
 
         # Getting the data before the update for comparison
         response = self.client.get(reverse('get_consumer', kwargs={'consumer_pk': pk}))
         original_data = response.json()['result']
 
-        # Adding the pk and updated password to original_data
+        # Adding the pk and updated email to original_data
         original_data['pk'] = pk
-        original_data['password'] = password
+        original_data['email'] = email
         # print(original_data)
 
         response = self.client.post(reverse('update_consumer', kwargs={'consumer_pk': pk}), post_data)
@@ -341,7 +341,7 @@ class UpdateTestCase(TestCase):
 
         pk=2
 
-        post_data = {'username': 'megan', 'password': 'supersecret', 'first_name': 'Megan', 'last_name': 'Smith',
+        post_data = {'username': 'megan', 'password': "supersecret", 'first_name': 'Megan', 'last_name': 'Smith',
                      'email': 'msmith@hotmail.com', 'phone': '753-123-1254', 'bio': 'I am a senior at GMU.',
                      'skills': 'web design'}
 
@@ -355,19 +355,20 @@ class UpdateTestCase(TestCase):
         #Adding pk to the post_data
         original_data = post_data
         original_data['pk'] = pk
+        #original_data['password'] = make_password(password, salt=None, hasher='default')
         #print(original_data)
 
         #Checks that the updated data is the same as the posted data
         results = response.json()['result']
-
+        original_data['password'] = response.json()['result']['password']
         self.assertEquals(original_data, results)
 
     def test_update_producer_one_field(self):
         pk = 2
 
-        password = "new_password"
+        email = "eavery2@yahoo.com"
 
-        post_data = {'password': password}
+        post_data = {'email': email}
 
         # Getting the data before the update for comparison
         response = self.client.get(reverse('get_producer', kwargs={'producer_pk': pk}))
@@ -375,14 +376,14 @@ class UpdateTestCase(TestCase):
 
         # Adding the pk and updated password to original_data
         original_data['pk'] = pk
-        original_data['password'] = password
+        original_data['email'] = email
         # print(original_data)
 
         response = self.client.post(reverse('update_producer', kwargs={'producer_pk': pk}), post_data)
 
         # print(response.json()['result'])
 
-        # Checks that only the password of the updated data is affected
+        # Checks that only the email of the updated data is affected
         results = response.json()['result']
 
         self.assertEquals(original_data, results)
@@ -465,7 +466,7 @@ class UpdateTestCase(TestCase):
         pk=1
 
         post_data = {'title': 'New to Django', 'offered_price': 100,
-                     'description': 'Django confuses me.  Can somebody teach me?', 'timestamp': 'March 6, 2018.  8:32',
+                     'description': 'Django confuses me.  Can somebody teach me?',
                      'availability': 'Mondays', 'consumer': 4, 'accepted_producer': 1}
 
         #response = self.client.get(reverse('get_consumerRequest', kwargs={'consumerRequest_pk': pk}))
@@ -482,7 +483,7 @@ class UpdateTestCase(TestCase):
 
         #Checks that the updated data is the same as the posted data
         results = response.json()['result']
-
+        original_data['timestamp'] = response.json()['result']['timestamp']
         self.assertEquals(original_data, results)
 
     def test_update_consumerRequest_all_nonforeign_fields(self):
@@ -491,7 +492,7 @@ class UpdateTestCase(TestCase):
 
         #User does not change consumer nor accepted_producer
         post_data = {'title': 'New to Django', 'offered_price': 100,
-                     'description': 'Django confuses me.  Can somebody teach me?', 'timestamp': 'March 6, 2018.  8:32',
+                     'description': 'Django confuses me.  Can somebody teach me?',
                      'availability': 'Mondays'}
 
         response = self.client.get(reverse('get_consumerRequest', kwargs={'consumerRequest_pk': pk}))
@@ -502,7 +503,6 @@ class UpdateTestCase(TestCase):
         original_data['title'] = post_data['title']
         original_data['offered_price'] = post_data['offered_price']
         original_data['description'] = post_data['description']
-        original_data['timestamp'] = post_data['timestamp']
         original_data['availability'] = post_data['availability']
         # print(original_data)
 
@@ -512,6 +512,7 @@ class UpdateTestCase(TestCase):
 
         #Checks that the updated data is the same as the posted data
         results = response.json()['result']
+        original_data['timestamp'] = response.json()['result']['timestamp']
 
         self.assertEquals(original_data, results)
 
@@ -537,6 +538,7 @@ class UpdateTestCase(TestCase):
 
         # Checks that only the rating of the updated data is affected
         results = response.json()['result']
+        original_data['timestamp'] = response.json()['result']['timestamp']
 
         self.assertEquals(original_data, results)
 
