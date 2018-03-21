@@ -3,7 +3,7 @@ from django.core.urlresolvers import reverse
 import urllib.request
 import urllib.parse
 import json
-from webapp.models import Consumer, Producer, Review, ConsumerRequest
+from webapp.models import Consumer, Producer, Review, ConsumerRequest, Authenticator
 from django.contrib.auth.hashers import make_password, check_password
 
 #Create your tests here.
@@ -165,7 +165,7 @@ class CreatedTestCase(TestCase):
         self.assertEquals(response.json()['result']['pk'], created_pk)
 
     def test_create_consumer_request_without_producer(self):
-        post_data = {'title': 'New to Django', 'offered_price': 100, 'description': 'Django confuses me.  Can somebody teach me?', 'timestamp': 'March 6, 2018.  8:32', 'availability':'Mondays', 'consumer': 4}
+        post_data = {'title': 'New to Django', 'offered_price': 100, 'description': 'Django confuses me.  Can somebody teach me?', 'availability':'Mondays', 'consumer': 4}
 
         response = self.client.post(reverse('create_consumerRequest'), post_data)
 
@@ -602,6 +602,138 @@ class HighestPriceConsumerRequestTestCase(TestCase):
 
         # compares the manually checked highest price with the microservice's highest price
         self.assertEquals(highest_price, max_price)
+
+    # tearDown method is called after each test
+    def tearDown(self):
+        pass  # nothing to tear down
+
+class AuthenticatorTestCase(TestCase):
+    # setUp method is called before each test in this class
+
+    fixtures = ['authenticators.json']
+
+    def setUp(self):
+
+        pass  # nothing to set up
+
+    def validate_authenticator(self):
+        authenticator = "e69ce6604336c5638262c6eb0ed812802e22ebde4827e2dda30c207d28ce0ee1"
+        post_data = {'authenticator': authenticator}
+
+        response = self.client.post(reverse('validate'), post_data)
+
+        self.assertTrue(response.json()['ok'])
+
+    def validate_invalid_authenticator(self):
+        authenticator = "e69ce6604336c5638262c6eb0ed812802e22ebde4827e2dda30c207d28ce0ee2"
+        post_data = {'authenticator': authenticator}
+
+        response = self.client.post(reverse('validate'), post_data)
+
+        self.assertFalse(response.json()['ok'])
+
+    def test_create_authenticator_for_consumer(self):
+        post_data = {'user_id': 1, 'is_consumer': True}
+
+        response = self.client.post(reverse('create_authenticator'), post_data)
+        results=response.json()['result']
+        authenticator = response.json()['result']['authenticator']
+
+        post_data_2 = {'authenticator': authenticator}
+
+        # validate the authenticator
+        response = self.client.post(reverse('validate'), post_data_2)
+        # print(response.json()['result'])
+
+        # checks that response contains value with same pk as created
+        self.assertEquals(response.json()['result'], results)
+
+    def test_create_authenticator_for_invalid_consumer(self):
+        post_data = {'user_id': 0, 'is_consumer': True}
+
+        response = self.client.post(reverse('create_authenticator'), post_data)
+        self.assertFalse(response.json()['ok'])
+
+    def test_create_authenticator_for_producer(self):
+        post_data = {'user_id': 2, 'is_consumer': False}
+
+        response = self.client.post(reverse('create_authenticator'), post_data)
+        results = response.json()['result']
+        authenticator = response.json()['result']['authenticator']
+
+        post_data_2 = {'authenticator': authenticator}
+
+        # validate the authenticator
+        response = self.client.post(reverse('validate'), post_data_2)
+        # print(response.json()['result'])
+
+        # checks that response contains value with same pk as created
+        self.assertEquals(response.json()['result'], results)
+
+    def test_create_authenticator_for_invalid_producer(self):
+        post_data = {'user_id': 0, 'is_consumer': False}
+
+        response = self.client.post(reverse('create_authenticator'), post_data)
+        self.assertFalse(response.json()['ok'])
+
+    def test_login_consumer(self):
+        post_data = {'username': 'mylee3', 'password': 'ilikeseals', 'is_consumer': True}
+
+        response = self.client.post(reverse('login'), post_data)
+        results = response.json()['result']
+        #print("from test login, results: " + str(results))
+        authenticator = response.json()['result']['authenticator']
+        #print(authenticator)
+        post_data_2 = {'authenticator': authenticator}
+
+        # validate the authenticator
+        response = self.client.post(reverse('validate'), post_data_2)
+        #print("from test login, results: 2" + str(response.json()['result']))
+
+        # checks that response contains value with same pk as created
+        self.assertEquals(response.json()['result'], results)
+
+    def test_login_consumer_invalid_password(self):
+        post_data = {'username': 'mylee3', 'password': 'password', 'is_consumer': True}
+
+        response = self.client.post(reverse('login'), post_data)
+        self.assertFalse(response.json()['ok'])
+
+    def test_delete_authenticator_for_consumer(self):
+        post_data = {'authenticator': 'e69ce6604336c5638262c6eb0ed812802e22ebde4827e2dda30c207d28ce0ee1'}
+
+        response = self.client.post(reverse('delete_authenticator'), post_data)
+        results = response.json()['result']
+
+        # validate the authenticator
+        response = self.client.post(reverse('validate'), post_data)
+        # print(response.json()['result'])
+
+        # checks that response contains value with same pk as created
+        self.assertFalse(response.json()['ok'])
+
+    def test_login_producer(self):
+        post_data = {'username': 'eavery', 'password': 'lvbears', 'is_consumer': False}
+
+        response = self.client.post(reverse('login'), post_data)
+        results = response.json()['result']
+        # print("from test login, results: " + str(results))
+        authenticator = response.json()['result']['authenticator']
+        # print(authenticator)
+        post_data_2 = {'authenticator': authenticator}
+
+        # validate the authenticator
+        response = self.client.post(reverse('validate'), post_data_2)
+        # print("from test login, results: 2" + str(response.json()['result']))
+
+        # checks that response contains value with same pk as created
+        self.assertEquals(response.json()['result'], results)
+
+    def test_login_producer_invalid_password(self):
+        post_data = {'username': 'eavery', 'password': 'password', 'is_consumer': False}
+
+        response = self.client.post(reverse('login'), post_data)
+        self.assertFalse(response.json()['ok'])
 
     # tearDown method is called after each test
     def tearDown(self):
