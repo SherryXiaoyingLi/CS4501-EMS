@@ -8,7 +8,6 @@ from django.views.decorators.csrf import csrf_exempt
 import urllib.request
 import urllib.parse
 
-# Create your views here.
 def index(request):
     context_dict = {'newest_pk': 1, 'highest_pk': 1}
 
@@ -60,3 +59,39 @@ def request_detail(request, consumerRequest_pk):
 
     else:
         return HttpResponse("Consumer request does not exist.")
+
+
+#for login page
+#read login info, pass to log in exp srvc, receive authenticator back if password correct
+#if successfully logged in, pass in cookie to browser
+#if failed, return login failure response
+def login (request):
+    #need to add login form here???
+    resultResp= {}
+    response= {}
+    
+    req = urllib.request.Request('http://exp-api:8000/api/v1/login/') #change url???  data readin???
+    resp_json = urllib.request.urlopen(req).read().decode('utf-8')
+    resp = json.loads(resp_json)
+                
+    if resp['ok']:
+        
+         resultResp['authenticator'] = resp['result']['authenticator']
+         cookie_key =resultResp['authenticator']['user_id']
+         cookie_value = resultResp['authenticator']
+         response = render(request, "login.html")
+            
+         #set cookie and use user_id as cookie key/name/id
+         response.set_cookie(key=cookie_key,value=cookie_value,path='/',domain=None)
+         return response
+    
+    else:
+         return HttpResponse("Log in validation failed. Please create account first.")
+
+
+#for logout page
+#remove the HTTP cookie and call delete
+#def logout(request):
+
+
+
