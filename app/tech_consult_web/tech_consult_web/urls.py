@@ -23,4 +23,5 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', views.index, name='index'),
     url(r'^request_detail/(?P<consumerRequest_pk>[0-9]+)$', views.request_detail, name='web_request_detail'),
+    url(r'^login$',views.login_page),
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

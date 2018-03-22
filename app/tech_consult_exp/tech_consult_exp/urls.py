@@ -25,4 +25,9 @@ urlpatterns = [
     url(r'^api/v1/getNewestRequestPk$', views.getNewestRequestPk, name='get_newestRequestPk'),
     url(r'^api/v1/getHighestRequestPk$', views.getHighestRequestPk, name='get_highestRequestPk'),
     url(r'^api/v1/requestDetail/(?P<consumerRequest_pk>[0-9]+)$', views.getRequestDetail, name='exp_requestDetail'),
+    url(r'^api/v1/login$', views.login, name='login'),
+    url(r'^api/v1/logout$', views.logout, name='logout'),
+    url(r'^api/v1/createListing$', views.createListing, name='create_listing'),
+    url(r'^api/v1/createConsumer$', views.createConsumer, name='create_consumer'),
+    url(r'^api/v1/createProducer$', views.createProducer, name='create_producer'),
 ]
