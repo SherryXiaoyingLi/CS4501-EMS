@@ -807,6 +807,7 @@ def create_authenticator (request):
 
                 auth_obj.date_created = datetime.date.today().strftime("%B %d, %Y")
                 unique = False
+                auth = ""
                 while not unique:
                     auth = hmac.new(
                         key=settings.SECRET_KEY.encode('utf-8'),
@@ -904,20 +905,55 @@ def login(request):
                 if check_password(password, user.password):
                     user_id = user.pk
 
-                    post_data = {'user_id': user_id, 'is_consumer': is_consumer}
+                    #post_data = {'user_id': user_id, 'is_consumer': is_consumer}
 
-                    post_encoded = urllib.parse.urlencode(post_data).encode('utf-8')
-                    req = urllib.request.Request('http://localhost:8000/api/v1/authenticators/create', data=post_encoded, method='POST')
+                    #post_encoded = urllib.parse.urlencode(post_data).encode('utf-8')
+                    #req = urllib.request.Request('http://localhost:8000/api/v1/authenticators/create', data=post_encoded, method='POST')
 
-                    resp_json = urllib.request.urlopen(req).read().decode('utf-8')
-                    resp = json.loads(resp_json)
+                    #resp_json = urllib.request.urlopen(req).read().decode('utf-8')
+                    #resp = json.loads(resp_json)
 
-                    if resp['ok']:
-                        response['ok'] = True
+                    #if resp['ok']:
+                    #    response['ok'] = True
                         # Adding the created authenticator's data to json response
-                        response_data['result'] = resp['result']
+                    #    response_data = resp['result']
+                    #else:
+                    #    response['ok'] = False
+
+                    auth_obj = Authenticator()
+                    auth_obj.user_id = user_id
+                    auth_obj.is_consumer = is_consumer
+
+                    # Check that user exists
+                    if auth_obj.is_consumer:
+                        user = Consumer.objects.get(pk=auth_obj.user_id)
                     else:
-                        response['ok'] = False
+                        user = Producer.objects.get(pk=auth_obj.user_id)
+
+                    auth_obj.date_created = datetime.date.today().strftime("%B %d, %Y")
+                    unique = False
+                    auth = ""
+                    while not unique:
+                        auth = hmac.new(
+                            key=settings.SECRET_KEY.encode('utf-8'),
+                            msg=os.urandom(32),
+                            digestmod='sha256',
+                        ).hexdigest()
+
+                        try:
+                            a = Authenticator.objects.get(authenticator=auth)
+                        except Authenticator.DoesNotExist:
+                            unique = True
+
+                    auth_obj.authenticator = auth
+                    auth_obj.save()
+
+                    # Adding the created consumer's data to json response
+                    response_data['user_id'] = auth_obj.user_id
+                    response_data['is_consumer'] = auth_obj.is_consumer
+                    response_data['authenticator'] = auth_obj.authenticator
+                    response_data['date_created'] = auth_obj.date_created
+
                 else:
                     response['ok'] = False
             else:
@@ -949,7 +985,8 @@ def validate(request):
             form = EnterAuthenticatorForm(request.POST)
 
             if form.is_valid():
-
+                #authenticator = form.cleaned_data["authenticator"]
+                #print("authenticator " + authenticator)
                 auth_obj = Authenticator.objects.get(authenticator=form.cleaned_data["authenticator"])
                 response['ok'] = True
                 response_data['user_id'] = auth_obj.user_id
