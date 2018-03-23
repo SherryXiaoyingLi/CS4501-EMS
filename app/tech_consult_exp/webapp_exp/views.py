@@ -8,7 +8,6 @@ import urllib.request
 import urllib.parse
 import json
 
-# Create your views here.
 def index(request):
 
     return HttpResponse("CS4501 Project 3, Experience layer")
@@ -103,3 +102,75 @@ def getRequestDetail(request, consumerRequest_pk):
 
     response['result'] = response_data
     return JsonResponse(response)
+
+
+#Login authenticator
+#Take a username and password from client(web f.e/mobile app, etc)
+#Return an authenticator(passed from model API) back to client if user password correct
+def login(request):
+    response = {}
+    response_data= {}
+    
+    try:
+        #calling model API views.login, get an authenticator back if username and password correct
+        username = "mylee3"
+        password = "ilikeseals"
+        is_consumer = True
+        post_data = {'username': username, 'password': password, 'is_consumer': is_consumer}
+        post_encoded = urllib.parse.urlencode(post_data).encode('utf-8')
+        req = urllib.request.Request('http://models-api:8000/api/v1/login', data=post_encoded, method='POST') #data???
+        resp_json = urllib.request.urlopen(req).read().decode('utf-8')
+        results = json.loads(resp_json)
+        
+        if results['ok']:
+            
+            response_data['authenticator'] = results['result']['authenticator']
+            
+            response['ok'] = True
+        
+        else:
+            response['ok'] = False
+    except:
+        response["ok"] = False
+    
+    response['result'] = response_data
+    return JsonResponse(response)
+
+
+def logout(request):
+    response = {}
+    response_data= {}
+    
+    response["ok"] = False
+    
+    response['result'] = response_data
+    return JsonResponse(response)
+
+def createListing(request):
+    response = {}
+    response_data= {}
+    
+    response["ok"] = False
+    
+    response['result'] = response_data
+    return JsonResponse(response)
+
+def createConsumer(request):
+    response = {}
+    response_data= {}
+
+    response["ok"] = False
+    
+    response['result'] = response_data
+    return JsonResponse(response)
+
+def createProducer(request):
+    response = {}
+    response_data= {}
+    
+    #response["ok"] = False
+    
+    response['result'] = response_data
+    return JsonResponse(response)
+
+
