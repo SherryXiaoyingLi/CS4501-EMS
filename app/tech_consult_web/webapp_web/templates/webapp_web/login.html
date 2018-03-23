@@ -10,17 +10,38 @@
     <title>Technology Consultation</title>
 </head>
 
+
 <body>
     <h1>Technology Consultation</h1>
-<h3>Log In</h3>
+    <h3>Log In</h3>
 
+{% if logged_in %}
+    <h4>You are already logged in!</h4>
+
+{% else %}
 <h4>
-    <p>Consumer or Producer: {{type}}</p>
 
-    <p>Username: {{username}}</p>
-    <p>Password: {{password}}</p>                                                                                     
+    <form id="login_form" method="post" class="form-inline" action="">
 
+        {% csrf_token %}
+        {% for hidden in form.hidden_fields %}
+            {{ hidden }}
+        {% endfor %}
+
+        {% for field in form.visible_fields %}
+            {{ field.errors }}
+            {{ field.help_text }}
+            <p>{{ field }}</p>
+        {% endfor %}
+
+        
+        <input type="submit" name="submit" value="Submit" />
+
+        <br><a href="/">Home</a><br />
+    </form>                                                                           
 </h4>
+{% endif %}
+
     </body>
 </html>
 
