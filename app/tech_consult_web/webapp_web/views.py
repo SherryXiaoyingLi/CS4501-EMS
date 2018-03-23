@@ -1,5 +1,7 @@
 from django.shortcuts import render
+from .forms import LoginForm
 from django.shortcuts import render_to_response
+from django.http import HttpResponseRedirect
 
 import json
 from django.http import HttpResponse
@@ -8,7 +10,6 @@ from django.views.decorators.csrf import csrf_exempt
 import urllib.request
 import urllib.parse
 
-# Create your views here.
 def index(request):
     context_dict = {'newest_pk': 1, 'highest_pk': 1}
 
@@ -60,3 +61,74 @@ def request_detail(request, consumerRequest_pk):
 
     else:
         return HttpResponse("Consumer request does not exist.")
+
+
+#for login page
+#read login info, pass to log in exp srvc, receive authenticator back if password correct
+#if successfully logged in, pass in cookie to browser
+#if failed, return login failure response
+def login (request):
+ logged_in = True
+ auth = request.COOKIES.get('auth')
+ if not auth:
+    logged_in = False
+ resultResp= {}
+ response= {}
+ try:
+    if request.method =='POST':
+        form = LoginForm(request.POST)
+         
+        if form.is_valid():
+            
+            #response['ok'] = True
+                
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            is_consumer = form.cleaned_data['is_consumer']
+            
+            username = "mylee3"
+            password = "ilikeseals"
+            is_consumer = True
+            post_data = {'username': username, 'password': password, 'is_consumer': is_consumer}
+            post_encoded = urllib.parse.urlencode(post_data).encode('utf-8')
+            
+            # To do: implement django form and post in exp layer
+            #req = urllib.request.Request('http://exp-api:8000/api/v1/login',data=post_encoded,method='POST')
+            req = urllib.request.Request('http://exp-api:8000/api/v1/login')
+            resp_json = urllib.request.urlopen(req).read().decode('utf-8')
+            resp = json.loads(resp_json)
+                
+            if resp['ok']:
+        
+                resultResp['authenticator'] = resp['result']['authenticator']
+                #cookie_key =resultResp['authenticator']['user_id']
+                cookie_value = resultResp['authenticator']
+                response = render(request, "index.html")
+            
+                #set cookie and use user_id as cookie key/name/id
+                response.set_cookie(key="auth",value=cookie_value,path='/',domain=None)
+                return response
+        else:
+            return HttpResponse("Log in validation failed. Please create account first.")
+    else:
+        form = LoginForm()
+        return render(request, 'login.html', {'form':form , 'logged_in':logged_in, 'auth':auth})
+ except Consumer.DoesNotExist:
+    return HttpResponse("Log in validation failed. Please create account first.")
+
+def logout(request):
+    #this variable is to show status of user, not to be changed in this method
+    logged_in = True
+    auth = request.COOKIES.get('auth')
+    if not auth:
+      logged_in = False
+      return render(request, 'logout.html',{'logged_in':logged_in})
+
+    else:
+       #delete cookie, authenticator
+       response = HttpResponseRedirect('login')
+       response.delete_cookie('auth')
+       return response
+
+
+

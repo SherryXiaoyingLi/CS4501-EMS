@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="en">
+<head>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="{% static 'webapp_web/mystyle.css' %}">
+
+
+    <title>Technology Consultation</title>
+</head>
+
+
+<body>
+    <h1>Technology Consultation</h1>
+    <h3>Log Out</h3>
+
+{% if logged_in %}
+
+ <h4>You are logged out!</h4>
+
+{% else %}
+<h4>You need to log in!</h4>
+
+{% endif %}
+
+    </body>
+</html>
+
+
