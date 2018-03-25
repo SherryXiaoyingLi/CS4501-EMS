@@ -1,8 +1,10 @@
 from django.shortcuts import render
 from django.shortcuts import render_to_response
-
+from .forms import LoginForm
+from .forms import EnterAuthenticatorForm
 from django.http import HttpResponse
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
 import urllib.request
 import urllib.parse
@@ -107,45 +109,84 @@ def getRequestDetail(request, consumerRequest_pk):
 #Login authenticator
 #Take a username and password from client(web f.e/mobile app, etc)
 #Return an authenticator(passed from model API) back to client if user password correct
+@csrf_exempt
 def login(request):
-    response = {}
-    response_data= {}
-    
-    try:
+  response = {}
+  response_data= {}
+
+  try:
+   if request.method =='POST':
+     form = LoginForm(request.POST)
+        
+     if form.is_valid():
+        username = form.cleaned_data['username']
+        password = form.cleaned_data['password']
+        is_consumer = form.cleaned_data['is_consumer']
+
         #calling model API views.login, get an authenticator back if username and password correct
-        username = "mylee3"
-        password = "ilikeseals"
-        is_consumer = True
+        #username = "mylee3"
+        #password = "ilikeseals"
+        #is_consumer = True
         post_data = {'username': username, 'password': password, 'is_consumer': is_consumer}
         post_encoded = urllib.parse.urlencode(post_data).encode('utf-8')
-        req = urllib.request.Request('http://models-api:8000/api/v1/login', data=post_encoded, method='POST') #data???
+        req = urllib.request.Request('http://models-api:8000/api/v1/login', data=post_encoded, method='POST')
         resp_json = urllib.request.urlopen(req).read().decode('utf-8')
         results = json.loads(resp_json)
         
         if results['ok']:
             
             response_data['authenticator'] = results['result']['authenticator']
+            response_data['user_id'] = results['result']['user_id']
+            response_data['is_consumer'] = results['result']['is_consumer']
             
             response['ok'] = True
         
         else:
             response['ok'] = False
-    except:
+     else:
+        response['ok'] = False
+   else:
+       form = LoginForm()
+       return render(request, 'login.html', {'form':form})
+
+  except:
         response["ok"] = False
     
-    response['result'] = response_data
-    return JsonResponse(response)
+  response['result'] = response_data
+  return JsonResponse(response)
 
-
+@csrf_exempt
 def logout(request):
     response = {}
     response_data= {}
-    
-    response["ok"] = False
-    
+    try:
+       if request.method =='POST':
+           form = EnterAuthenticatorForm(request.POST)
+           if form.is_valid():
+              authenticator = form.cleaned_data['authenticator']
+              post_data={'authenticator':authenticator}
+              post_encoded = urllib.parse.urlencode(post_data).encode('utf-8')
+              req = urllib.request.Request('http://models-api:8000/api/v1/authenticators/delete', data=post_encoded, method='POST')
+              resp_json = urllib.request.urlopen(req).read().decode('utf-8')
+              results = json.loads(resp_json)
+              if results['ok']:
+                      response_data['authenticator'] = authenticator
+                      response['ok'] = True
+              else:
+                      response['ok'] = False
+           else:
+               response['ok'] = False
+       else:
+           form = EnterAuthenticatorForm()
+           return render(request, 'logout.html', {'form':form})
+    except:
+           response["ok"] = False
+                    
     response['result'] = response_data
     return JsonResponse(response)
 
+
+@csrf_exempt
 def createListing(request):
     response = {}
     response_data= {}
@@ -155,6 +196,7 @@ def createListing(request):
     response['result'] = response_data
     return JsonResponse(response)
 
+@csrf_exempt
 def createConsumer(request):
     response = {}
     response_data= {}
@@ -164,6 +206,7 @@ def createConsumer(request):
     response['result'] = response_data
     return JsonResponse(response)
 
+@csrf_exempt
 def createProducer(request):
     response = {}
     response_data= {}

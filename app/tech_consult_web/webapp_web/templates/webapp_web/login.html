@@ -13,14 +13,15 @@
 
 <body>
     <h1>Technology Consultation</h1>
-    <h3>Log In</h3>
 
 {% if logged_in %}
-    <h4>You are already logged in!</h4>
-
+    <h4>You are already logged in!
+    {{auth}}
+    <br><a href="/">Home</a><br /></h4>
+    
 {% else %}
 <h4>
-
+    Log In
     <form id="login_form" method="post" class="form-inline" action="">
 
         {% csrf_token %}
