@@ -1,26 +1,20 @@
 <!DOCTYPE html>
-{% load staticfiles %}
+
 <html lang="en">
 <head>
 
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
-    <link rel="stylesheet" type="text/css" href="{% static 'webapp_web/mystyle.css' %}">
-
-
+   
     <title>Technology Consultation</title>
 </head>
 
 
 <body>
     <h1>Technology Consultation</h1>
-    <h4>Log Out</h4>
+    <h3>Log In</h3>
 
-{% if logged_in %}
-
- <h4>You are logged out!  </h4>
 <h4>
-    Log Out
-    <form id="logout_form" method="post" class="form-inline" action="">
+
+    <form id="login_form" method="post" class="form-inline" action="">
 
         {% csrf_token %}
         {% for hidden in form.hidden_fields %}
@@ -36,21 +30,9 @@
         
         <input type="submit" name="submit" value="Submit" />
 
-        <br><a href="/">Home</a><br />
     </form>                                                                           
 </h4>
 
-
-
-{% else %}
-<h4>You need to log in first!</h4>
-{{logged_in}}
-{{auth}}
-
-
-{% endif %}
-
     </body>
 </html>
-
 
