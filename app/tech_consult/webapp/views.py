@@ -547,6 +547,7 @@ def get_consumerRequest(request, consumerRequest_pk):
             response_data['pk'] = consumerRequest.pk
             response_data['title'] = consumerRequest.title
             response_data['offered_price'] = consumerRequest.offered_price
+            response_data['timestamp'] = consumerRequest.timestamp
             response_data['description'] = consumerRequest.description
             response_data['availability'] = consumerRequest.availability
             response_data['consumer'] = consumerRequest.consumer.pk
