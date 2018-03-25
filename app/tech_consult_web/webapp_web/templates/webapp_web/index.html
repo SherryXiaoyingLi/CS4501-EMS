@@ -13,6 +13,11 @@
 <body>
     <h1>Technology Consultation</h1>
     <h2>CS 4501. Elliott Kim, Marissa Lee, Sherry Li</h2>
+    {% if logged_in %}
+    <br><a href="/logout">Log out</a><br /></h4>
+    {% else %}
+    <br><a href="/login">Log in</a><br /></h4>
+    {% endif %}
     <li><a href="/request_detail/{{ highest_pk }}"><h3>Highest Offers</h3></a></li>
     <li><a href="/request_detail/{{ newest_pk }}"><h3>Newest Consumer Requests</h3></a></li>
   
