@@ -254,7 +254,7 @@ def createConsumer(request):
 
                 # To do: implement django form and post in exp layer
                 #req = urllib.request.Request('http://exp-api:8000/api/v1/login',data=post_encoded,method='POST')
-                req = urllib.request.Request('http://exp-api:8000/api/v1/createConsumer')
+                req = urllib.request.Request('http://exp-api:8000/api/v1/createConsumer', data=post_encoded,method='POST')
                 resp_json = urllib.request.urlopen(req).read().decode('utf-8')
                 resp = json.loads(resp_json)
 
@@ -296,7 +296,7 @@ def createProducer(request):
 
                 # To do: implement django form and post in exp layer
                 #req = urllib.request.Request('http://exp-api:8000/api/v1/login',data=post_encoded,method='POST')
-                req = urllib.request.Request('http://exp-api:8000/api/v1/createProducer')
+                req = urllib.request.Request('http://exp-api:8000/api/v1/createProducer', data=post_encoded,method='POST')
                 resp_json = urllib.request.urlopen(req).read().decode('utf-8')
                 resp = json.loads(resp_json)
 

@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.shortcuts import render_to_response
 from .forms import LoginForm
-from .forms import EnterAuthenticatorForm, CreateConsumerRequestForm
+from .forms import EnterAuthenticatorForm, CreateConsumerRequestForm, CreateConsumerForm, CreateProducerForm
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -244,7 +244,42 @@ def createConsumer(request):
     response = {}
     response_data= {}
 
-    response["ok"] = False
+    try:
+        if request.method == 'POST':
+            form = CreateConsumerForm(request.POST)
+
+            if form.is_valid():
+                username = form.cleaned_data['username']
+                password = form.cleaned_data['password']
+                first_name = form.cleaned_data['first_name']
+                last_name = form.cleaned_data['last_name']
+                phone = form.cleaned_data['phone']
+                email = form.cleaned_data['email']
+
+                post_data = {'username':username, 'password':password, 'first_name': first_name, 'last_name':last_name, 'phone':phone}
+                post_encoded = urllib.parse.urlencode(post_data).encode('utf-8')
+                req = urllib.request.Request('http://models-api:8000/api/v1/consumers/create', data=post_encoded, method='POST') #data???
+                resp_json = urllib.request.urlopen(req).read().decode('utf-8')
+                results = json.loads(resp_json)
+
+                if results['ok']:
+                    response['ok'] = True
+                    response_data['username'] = results['result']['username']
+                    response_data['password'] = results['result']['password']
+                    response_data['first_name'] = results['result']['first_name']
+                    response_data['last_name'] = results['result']['last_name']
+                    response_data['phone'] = results['result']['phone']
+                    response_data['email'] = result['result']['email']
+                    response_data['pk'] = results['result']['pk']
+                else:
+                    response['ok'] = False
+            else:
+                response['ok'] = False
+        else:
+            form = CreateConsumerForm()
+            return render(request, 'create_consumer.html', {'form': form})
+    except Consumer.DoesNotExist:
+        response["ok"] = False
 
     response['result'] = response_data
     return JsonResponse(response)
@@ -254,7 +289,46 @@ def createProducer(request):
     response = {}
     response_data= {}
 
-    #response["ok"] = False
+    try:
+        if request.method == 'POST':
+            form = CreateProducerForm(request.POST)
+
+            if form.is_valid():
+                username = form.cleaned_data['username']
+                password = form.cleaned_data['password']
+                first_name = form.cleaned_data['first_name']
+                last_name = form.cleaned_data['last_name']
+                phone = form.cleaned_data['phone']
+                email = form.cleaned_data['email']
+                bio = form.cleaned_data['bio']
+                skills = form.cleaned_data['skills']
+
+                post_data = {'username':username, 'password':password, 'first_name': first_name, 'last_name':last_name, 'phone':phone, 'bio':bio, 'skills':skills}
+                post_encoded = urllib.parse.urlencode(post_data).encode('utf-8')
+                req = urllib.request.Request('http://models-api:8000/api/v1/producers/create', data=post_encoded, method='POST') #data???
+                resp_json = urllib.request.urlopen(req).read().decode('utf-8')
+                results = json.loads(resp_json)
+
+                if results['ok']:
+                    response['ok'] = True
+                    response_data['username'] = results['result']['username']
+                    response_data['password'] = results['result']['password']
+                    response_data['first_name'] = results['result']['first_name']
+                    response_data['last_name'] = results['result']['last_name']
+                    response_data['phone'] = results['result']['phone']
+                    response_data['email'] = result['result']['email']
+                    response_data['bio'] = results['result']['bio']
+                    response_data['skills'] = results['result']['skills']
+                    response_data['pk'] = results['result']['pk']
+                else:
+                    response['ok'] = False
+            else:
+                response['ok'] = False
+        else:
+            form = CreateProducerForm()
+            return render(request, 'create_producer.html', {'form': form})
+    except Consumer.DoesNotExist:
+        response["ok"] = False
 
     response['result'] = response_data
     return JsonResponse(response)
