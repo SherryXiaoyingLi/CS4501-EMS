@@ -233,7 +233,7 @@ def createListing(request):
         else:
             form = CreateConsumerRequestForm()
             return render(request, 'create_consumer_request.html', {'form': form})
-    except Consumer.DoesNotExist:
+    except:
         response["ok"] = False
 
     response['result'] = response_data
@@ -256,7 +256,7 @@ def createConsumer(request):
                 phone = form.cleaned_data['phone']
                 email = form.cleaned_data['email']
 
-                post_data = {'username':username, 'password':password, 'first_name': first_name, 'last_name':last_name, 'phone':phone}
+                post_data = {'username':username, 'password':password, 'first_name': first_name, 'last_name':last_name, 'phone':phone, 'email': email}
                 post_encoded = urllib.parse.urlencode(post_data).encode('utf-8')
                 req = urllib.request.Request('http://models-api:8000/api/v1/consumers/create', data=post_encoded, method='POST') #data???
                 resp_json = urllib.request.urlopen(req).read().decode('utf-8')
@@ -269,7 +269,7 @@ def createConsumer(request):
                     response_data['first_name'] = results['result']['first_name']
                     response_data['last_name'] = results['result']['last_name']
                     response_data['phone'] = results['result']['phone']
-                    response_data['email'] = result['result']['email']
+                    response_data['email'] = results['result']['email']
                     response_data['pk'] = results['result']['pk']
                 else:
                     response['ok'] = False
@@ -278,7 +278,7 @@ def createConsumer(request):
         else:
             form = CreateConsumerForm()
             return render(request, 'create_consumer.html', {'form': form})
-    except Consumer.DoesNotExist:
+    except:
         response["ok"] = False
 
     response['result'] = response_data
@@ -303,7 +303,7 @@ def createProducer(request):
                 bio = form.cleaned_data['bio']
                 skills = form.cleaned_data['skills']
 
-                post_data = {'username':username, 'password':password, 'first_name': first_name, 'last_name':last_name, 'phone':phone, 'bio':bio, 'skills':skills}
+                post_data = {'username':username, 'password':password, 'first_name': first_name, 'last_name':last_name, 'phone':phone, 'email':email, 'bio':bio, 'skills':skills}
                 post_encoded = urllib.parse.urlencode(post_data).encode('utf-8')
                 req = urllib.request.Request('http://models-api:8000/api/v1/producers/create', data=post_encoded, method='POST') #data???
                 resp_json = urllib.request.urlopen(req).read().decode('utf-8')
@@ -316,7 +316,7 @@ def createProducer(request):
                     response_data['first_name'] = results['result']['first_name']
                     response_data['last_name'] = results['result']['last_name']
                     response_data['phone'] = results['result']['phone']
-                    response_data['email'] = result['result']['email']
+                    response_data['email'] = results['result']['email']
                     response_data['bio'] = results['result']['bio']
                     response_data['skills'] = results['result']['skills']
                     response_data['pk'] = results['result']['pk']
@@ -327,7 +327,7 @@ def createProducer(request):
         else:
             form = CreateProducerForm()
             return render(request, 'create_producer.html', {'form': form})
-    except Consumer.DoesNotExist:
+    except:
         response["ok"] = False
 
     response['result'] = response_data
