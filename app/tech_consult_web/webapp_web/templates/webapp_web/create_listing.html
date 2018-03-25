@@ -15,11 +15,8 @@
     <h1>Technology Consultation</h1>
     <h3><center>Create Listing</center></h3>
 
-{% if logged_in %}
-    <h4>You are already logged in!</h4>
-
-{% else %}
-<h4>
+{% if is_consumer %}
+    <h4>
 
     <form id="create_listing_form" method="post" class="form-inline" action="">
 
@@ -37,10 +34,13 @@
 
         <input type="submit" name="submit" value="Submit" />
 
-        <br><a href="/">Home</a><br />
     </form>
 </h4>
-{% endif %}
 
+{% else %}
+     <h4>You cannot create a listing as a producer.</h4>
+    <br><a href="/logout">Log out</a><br />
+{% endif %}
+    <br><a href="/">Home</a><br />
     </body>
 </html>
