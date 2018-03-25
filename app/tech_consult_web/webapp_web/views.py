@@ -3,6 +3,7 @@ from .forms import LoginForm
 from .forms import EnterAuthenticatorForm
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
+from django.core.urlresolvers import reverse
 
 import json
 from django.http import HttpResponse
@@ -12,12 +13,19 @@ import urllib.request
 import urllib.parse
 
 def index(request):
+    logged_in = True
+    auth = request.COOKIES.get('auth')
+    user_id = request.COOKIES.get('user_id')
+    is_consumer = request.COOKIES.get('is_consumer')
+    if not auth:
+        logged_in = False
+
     #response = render(request, 'logout.html')
     #response.delete_cookie('auth')
     #response.delete_cookie('user_id')
     #response.delete_cookie('is_consumer')
     
-    context_dict = {'newest_pk': 1, 'highest_pk': 1}
+    context_dict = {'newest_pk': 1, 'highest_pk': 1, 'logged_in':logged_in, 'msg':None}
 
     # make a GET request and parse the returned JSON
     # note, no timeouts, error handling or all the other things needed to do this for real
@@ -114,18 +122,17 @@ def login (request):
                 #cookie_key =resultResp['authenticator']['user_id']
                 cookie_value = resultResp['authenticator']
 
-                response = render(request, "index.html")
-#next = reverse('home')
-# response = HttpResponseRedirect(next)
+                response = HttpResponseRedirect(reverse('index'))
+                #next = reverse('home')
+                # response = HttpResponseRedirect(next)
                 
                 #set cookie and use user_id as cookie key
                 response.set_cookie(key="auth",value=cookie_value,path='/',domain=None)
                 response.set_cookie(key="user_id",value=resultResp['user_id'],path='/',domain=None)
                 response.set_cookie(key="is_consumer",value=resultResp['is_consumer'],path='/',domain=None)
-                
-##
-#  resultResp['username'] = resp['result']['username']
-#               rsponse.set_cookie(key="username",value=resultResp['username'])
+
+                #  resultResp['username'] = resp['result']['username']
+                #response.set_cookie(key="username",value=resultResp['username'])
                 
                 return response
             else:
@@ -144,6 +151,7 @@ def logout(request):
     #response.delete_cookie('auth')
     #response.delete_cookie('user_id')
     #response.delete_cookie('is_consumer')
+
  #this variable shows the current status of user
  logged_in = True
  auth = request.COOKIES.get('auth')
@@ -155,7 +163,7 @@ def logout(request):
     return render(request, 'logout.html',{'logged_in':logged_in,'auth':auth})
 
  else:
-       #delete cookie, authenticator
+    #delete cookie, authenticator
     
     resultResp= {}
     response= {}
@@ -172,7 +180,7 @@ def logout(request):
             
             if resp['ok']:
                 
-                response = render(request, 'logout.html')
+                response = render(request, 'logout.html',{'logged_in':True,'auth':auth})
                 response.delete_cookie('auth')
                 response.delete_cookie('user_id')
                 response.delete_cookie('is_consumer')
@@ -180,7 +188,7 @@ def logout(request):
             else:
                 return HttpResponse("Log out failed.")
       
-    except Consumer.DoesNotExist:
+    except:
         return HttpResponse("Log out failed.")
 
 
