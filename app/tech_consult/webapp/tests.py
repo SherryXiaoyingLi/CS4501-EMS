@@ -735,6 +735,25 @@ class AuthenticatorTestCase(TestCase):
         response = self.client.post(reverse('login'), post_data)
         self.assertFalse(response.json()['ok'])
 
+    def test_delete_authenticator_for_producer(self):
+        post_data = {'user_id': 2, 'is_consumer': False}
+
+        response = self.client.post(reverse('create_authenticator'), post_data)
+        results = response.json()['result']
+        authenticator = response.json()['result']['authenticator']
+
+        post_data_2 = {'authenticator': authenticator}
+
+        response = self.client.post(reverse('delete_authenticator'), post_data_2)
+        results = response.json()['result']
+
+        # validate the authenticator
+        response = self.client.post(reverse('validate'), post_data_2)
+        # print(response.json()['result'])
+
+        # checks that response contains value with same pk as created
+        self.assertFalse(response.json()['ok'])
+
     # tearDown method is called after each test
     def tearDown(self):
         pass  # nothing to tear down

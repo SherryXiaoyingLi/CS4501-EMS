@@ -84,7 +84,7 @@ All fields need to be entered for CREATE, but not UPDATE
 * 8001/api/v1/authenticators/validate, post_data={authenticator}
 
 ### Login
-* 8001/api/v1/login, post_data={username, password}
+* 8001/api/v1/login, post_data={username, password, user_id}
 
 ## Services
 
