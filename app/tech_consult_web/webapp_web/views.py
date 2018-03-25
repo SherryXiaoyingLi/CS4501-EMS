@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .forms import LoginForm
+from .forms import LoginForm, CreateConsumerRequestForm, CreateConsumerForm
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
 
@@ -77,34 +77,34 @@ def login (request):
  try:
     if request.method =='POST':
         form = LoginForm(request.POST)
-         
+
         if form.is_valid():
-            
+
             #response['ok'] = True
-                
+
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
             is_consumer = form.cleaned_data['is_consumer']
-            
+
             username = "mylee3"
             password = "ilikeseals"
             is_consumer = True
             post_data = {'username': username, 'password': password, 'is_consumer': is_consumer}
             post_encoded = urllib.parse.urlencode(post_data).encode('utf-8')
-            
+
             # To do: implement django form and post in exp layer
             #req = urllib.request.Request('http://exp-api:8000/api/v1/login',data=post_encoded,method='POST')
             req = urllib.request.Request('http://exp-api:8000/api/v1/login')
             resp_json = urllib.request.urlopen(req).read().decode('utf-8')
             resp = json.loads(resp_json)
-                
+
             if resp['ok']:
-        
+
                 resultResp['authenticator'] = resp['result']['authenticator']
                 #cookie_key =resultResp['authenticator']['user_id']
                 cookie_value = resultResp['authenticator']
                 response = render(request, "index.html")
-            
+
                 #set cookie and use user_id as cookie key/name/id
                 response.set_cookie(key="auth",value=cookie_value,path='/',domain=None)
                 return response
@@ -130,5 +130,117 @@ def logout(request):
        response.delete_cookie('auth')
        return response
 
+def createListing(request):
+     resultResp= {}
+     response= {}
+     try:
+        if request.method =='POST':
+            form = CreateConsumerRequestForm(request.POST)
 
+            if form.is_valid():
 
+                #response['ok'] = True
+
+                title = form.cleaned_data['title']
+                offered_price = form.cleaned_data['offered_price']
+                description = form.cleaned_data['description']
+                availability = form.cleaned_data['availability']
+                consumer = 1
+
+                post_data = {'title': title, 'offered_price': offered_price, 'description': description, 'availability': availability, 'consumer':consumer}
+                post_encoded = urllib.parse.urlencode(post_data).encode('utf-8')
+
+                # To do: implement django form and post in exp layer
+                #req = urllib.request.Request('http://exp-api:8000/api/v1/login',data=post_encoded,method='POST')
+                req = urllib.request.Request('http://exp-api:8000/api/v1/createListing')
+                resp_json = urllib.request.urlopen(req).read().decode('utf-8')
+                resp = json.loads(resp_json)
+
+                if resp['ok']:
+                    response = render(request, "index.html")
+                    return response
+            else:
+                return HttpResponse("Failed to create listing.")
+        else:
+            form = CreateConsumerRequestForm()
+            return render(request, 'create_listing.html', {'form':form})
+     except Consumer.DoesNotExist:
+        return HttpResponse("Create listing failed.")
+
+def createConsumer(request):
+    resultResp = {}
+    response = {}
+    try:
+        if request.method =='POST':
+            form = CreateConsumerForm(request.POST)
+
+            if form.is_valid():
+
+                #response['ok'] = True
+
+                username = form.cleaned_data['username']
+                password = form.cleaned_data['password']
+                first_name = form.cleaned_data['first_name']
+                last_name = form.cleaned_data['last_name']
+                phone = form.cleaned_data['phone']
+                email = form.cleaned_data['email']
+
+                post_data = {'username': username, 'password': password, 'first_name': first_name, 'last_name': last_name, 'phone': phone, 'email':email}
+                post_encoded = urllib.parse.urlencode(post_data).encode('utf-8')
+
+                # To do: implement django form and post in exp layer
+                #req = urllib.request.Request('http://exp-api:8000/api/v1/login',data=post_encoded,method='POST')
+                req = urllib.request.Request('http://exp-api:8000/api/v1/createConsumer')
+                resp_json = urllib.request.urlopen(req).read().decode('utf-8')
+                resp = json.loads(resp_json)
+
+                if resp['ok']:
+                    response = render(request, "index.html")
+                    return response
+            else:
+                return HttpResponse("Failed to create account.")
+        else:
+            form = CreateConsumerForm()
+            return render(request, 'create_consumer.html', {'form':form})
+    except Consumer.DoesNotExist:
+        return HttpResponse("Create account failed.")
+
+def createProducer(request):
+    resultResp = {}
+    response = {}
+    try:
+        if request.method =='POST':
+            form = CreateProducerForm(request.POST)
+
+            if form.is_valid():
+
+                #response['ok'] = True
+
+                username = form.cleaned_data['username']
+                password = form.cleaned_data['password']
+                first_name = form.cleaned_data['first_name']
+                last_name = form.cleaned_data['last_name']
+                phone = form.cleaned_data['phone']
+                email = form.cleaned_data['email']
+                bio = form.cleaned_data['bio']
+                skills = form.cleaned_data['skills']
+
+                post_data = {'username': username, 'password': password, 'first_name': first_name, 'last_name': last_name, 'phone': phone, 'email':email, 'bio': bio, 'skills':skills}
+                post_encoded = urllib.parse.urlencode(post_data).encode('utf-8')
+
+                # To do: implement django form and post in exp layer
+                #req = urllib.request.Request('http://exp-api:8000/api/v1/login',data=post_encoded,method='POST')
+                req = urllib.request.Request('http://exp-api:8000/api/v1/createProducer')
+                resp_json = urllib.request.urlopen(req).read().decode('utf-8')
+                resp = json.loads(resp_json)
+
+                if resp['ok']:
+                    response = render(request, "index.html")
+                    return response
+            else:
+                return HttpResponse("Failed to create account.")
+        else:
+            form = CreateConsumerForm()
+            return render(request, 'create_producer.html', {'form':form})
+    except Consumer.DoesNotExist:
+        return HttpResponse("Create account failed.")

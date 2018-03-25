@@ -110,7 +110,7 @@ def getRequestDetail(request, consumerRequest_pk):
 def login(request):
     response = {}
     response_data= {}
-    
+
     try:
         #calling model API views.login, get an authenticator back if username and password correct
         username = "mylee3"
@@ -121,18 +121,18 @@ def login(request):
         req = urllib.request.Request('http://models-api:8000/api/v1/login', data=post_encoded, method='POST') #data???
         resp_json = urllib.request.urlopen(req).read().decode('utf-8')
         results = json.loads(resp_json)
-        
+
         if results['ok']:
-            
+
             response_data['authenticator'] = results['result']['authenticator']
-            
+
             response['ok'] = True
-        
+
         else:
             response['ok'] = False
     except:
         response["ok"] = False
-    
+
     response['result'] = response_data
     return JsonResponse(response)
 
@@ -140,18 +140,46 @@ def login(request):
 def logout(request):
     response = {}
     response_data= {}
-    
+
     response["ok"] = False
-    
+
     response['result'] = response_data
     return JsonResponse(response)
 
 def createListing(request):
     response = {}
     response_data= {}
-    
-    response["ok"] = False
-    
+
+    try:
+        if request.method == 'POST':
+            form = CreateConsumerRequestForm(request.POST)
+
+            if form.is_valid():
+
+                response['ok'] = True
+
+                title = form.cleaned_data['title']
+                offered_price = float(form.cleaned_data['offered_price'])
+                description = form.cleaned_data['description']
+                availability = form.cleaned_data['availability']
+                consumer = int(form.cleaned_data['consumer'])
+                accepted_producer = None
+
+                post_data = {'title':title, 'offered_price':offered_price, 'description': description, 'availability':availability, 'consumer':consumer, 'accepted_producer':accepted_producer}
+                post_encoded = urllib.parse.urlencode(post_data).encode('utf-8')
+                req = urllib.request.Request('http://models-api:8000/api/v1/consumerRequests/create', data=post_encoded, method='POST') #data???
+                resp_json = urllib.request.urlopen(req).read().decode('utf-8')
+                results = json.loads(resp_json)
+
+                if results['ok']:
+                    response['ok'] = True
+                else:
+                    response['ok'] = False
+        else:
+            response['ok'] = False
+    except Consumer.DoesNotExist:
+        response["ok"] = False
+
     response['result'] = response_data
     return JsonResponse(response)
 
@@ -160,17 +188,15 @@ def createConsumer(request):
     response_data= {}
 
     response["ok"] = False
-    
+
     response['result'] = response_data
     return JsonResponse(response)
 
 def createProducer(request):
     response = {}
     response_data= {}
-    
+
     #response["ok"] = False
-    
+
     response['result'] = response_data
     return JsonResponse(response)
-
-
