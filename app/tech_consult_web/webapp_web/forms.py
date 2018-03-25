@@ -21,7 +21,7 @@ class CreateConsumerForm(forms.Form):
     last_name = forms.CharField(max_length=200, help_text="Last Name: ")
     phone = forms.CharField(max_length=15, help_text="Phone Number: ")
     email = forms.CharField(max_length=200, help_text="Email Address: ")
-    
+
 class CreateProducerForm(forms.Form):
     username = forms.CharField(max_length=200, help_text="Username: ")
     password = forms.CharField(max_length=200, help_text="Password: ")
@@ -31,3 +31,7 @@ class CreateProducerForm(forms.Form):
     email = forms.CharField(max_length=200, help_text="Email Address: ")
     bio = forms.CharField(max_length=250, help_text="Bio: ")
     skills = forms.CharField(max_length=200, help_text="Skills: ")
+
+# Form to delete an authenticator
+class EnterAuthenticatorForm(forms.Form):
+    authenticator = forms.CharField(max_length=256, help_text="Authenticator: ")

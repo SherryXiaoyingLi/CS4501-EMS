@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="en">
+<head>
+
+   
+    <title>Technology Consultation</title>
+</head>
+
+
+<body>
+
+
+ <h4> 
+    <form id="logout_form" method="post" class="form-inline" action="">
+
+        {% csrf_token %}
+        {% for hidden in form.hidden_fields %}
+            {{ hidden }}
+        {% endfor %}
+
+        {% for field in form.visible_fields %}
+            {{ field.errors }}
+            {{ field.help_text }}
+            <p>{{ field }}</p>
+        {% endfor %}
+
+        
+        <input type="submit" name="submit" value="Submit" />
+
+       
+    </form>   </h4>
+
+    </body>
+</html>
+
+
