@@ -204,30 +204,43 @@ def createListing(request):
                 consumer = 1
                 accepted_producer = 0
                 '''
-                title = form.cleaned_data['title']
-                offered_price = float(form.cleaned_data['offered_price'])
-                description = form.cleaned_data['description']
-                availability = form.cleaned_data['availability']
-                consumer = int(form.cleaned_data['consumer'])
-                accepted_producer = None
-
-                post_data = {'title':title, 'offered_price':offered_price, 'description': description, 'availability':availability, 'consumer':consumer}
+                auth = form.cleaned_data['authenticator']
+                #validate the authenticator
+                post_data = {'authenticator': auth}
                 post_encoded = urllib.parse.urlencode(post_data).encode('utf-8')
-                req = urllib.request.Request('http://models-api:8000/api/v1/consumerRequests/create', data=post_encoded, method='POST') #data???
+                req = urllib.request.Request('http://models-api:8000/api/v1/authenticators/validate', data=post_encoded,
+                                             method='POST')
                 resp_json = urllib.request.urlopen(req).read().decode('utf-8')
                 results = json.loads(resp_json)
 
                 if results['ok']:
-                    response['ok'] = True
-                    response_data['title'] = results['result']['title']
-                    response_data['offered_price'] = results['result']['offered_price']
-                    response_data['description'] = results['result']['description']
-                    response_data['availability'] = results['result']['availability']
-                    response_data['consumer'] = results['result']['consumer']
-                    response_data['accepted_producer'] = None
-                    response_data['pk'] = results['result']['pk']
+                    title = form.cleaned_data['title']
+                    offered_price = float(form.cleaned_data['offered_price'])
+                    description = form.cleaned_data['description']
+                    availability = form.cleaned_data['availability']
+                    consumer = int(form.cleaned_data['consumer'])
+                    accepted_producer = None
+
+                    post_data = {'title':title, 'offered_price':offered_price, 'description': description, 'availability':availability, 'consumer':consumer}
+                    post_encoded = urllib.parse.urlencode(post_data).encode('utf-8')
+                    req = urllib.request.Request('http://models-api:8000/api/v1/consumerRequests/create', data=post_encoded, method='POST') #data???
+                    resp_json2 = urllib.request.urlopen(req).read().decode('utf-8')
+                    results2 = json.loads(resp_json2)
+
+                    if results2['ok']:
+                        response['ok'] = True
+                        response_data['title'] = results2['result']['title']
+                        response_data['offered_price'] = results2['result']['offered_price']
+                        response_data['description'] = results2['result']['description']
+                        response_data['availability'] = results2['result']['availability']
+                        response_data['consumer'] = results2['result']['consumer']
+                        response_data['accepted_producer'] = None
+                        response_data['pk'] = results2['result']['pk']
+                    else:
+                        response['ok'] = False
                 else:
                     response['ok'] = False
+                    response['msg'] = "Invalid authenticator"
             else:
                 response['ok'] = False
         else:

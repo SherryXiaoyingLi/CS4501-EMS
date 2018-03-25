@@ -17,6 +17,7 @@ def index(request):
     auth = request.COOKIES.get('auth')
     user_id = request.COOKIES.get('user_id')
     is_consumer = (request.COOKIES.get('is_consumer') == "True")
+    username = request.COOKIES.get('username')
     if not auth:
         logged_in = False
 
@@ -25,7 +26,7 @@ def index(request):
     #response.delete_cookie('user_id')
     #response.delete_cookie('is_consumer')
 
-    context_dict = {'newest_pk': 1, 'highest_pk': 1, 'logged_in':logged_in, 'is_consumer':is_consumer, 'msg':None}
+    context_dict = {'newest_pk': 1, 'highest_pk': 1, 'logged_in':logged_in, 'is_consumer':is_consumer, 'username':username, 'msg':None}
 
     # make a GET request and parse the returned JSON
     # note, no timeouts, error handling or all the other things needed to do this for real
@@ -51,6 +52,13 @@ def index(request):
     return render(request, "index.html", context_dict)
 
 def request_detail(request, consumerRequest_pk):
+    logged_in = True
+    auth = request.COOKIES.get('auth')
+    user_id = request.COOKIES.get('user_id')
+    is_consumer = (request.COOKIES.get('is_consumer') == "True")
+    username = request.COOKIES.get('username')
+    if not auth:
+        logged_in = False
     context_dict = {'title': 'New to AWS', 'description': 'Looking for someone to teach me AWS', 'offered_price': 75.0, 'timestamp': 'March 9, 2018.  7:55', 'availability': 'Mondays and Wednesdays', 'consumer_username': 'bob1', 'consumer_email': 'bob1@gmail.com', 'consumer_phone': '434-958-2913', 'producer_username': None}
 
     req = urllib.request.Request('http://exp-api:8000/api/v1/requestDetail/' + str(consumerRequest_pk))
@@ -70,7 +78,7 @@ def request_detail(request, consumerRequest_pk):
         context_dict['consumer_email'] = resp['result']['consumer_email']
         context_dict['consumer_phone'] = resp['result']['consumer_phone']
         context_dict['producer_username'] = resp['result']['producer_username']
-
+        context_dict['logged_in'] = logged_in
         return render(request, "request_detail.html", context_dict)
 
     else:
@@ -134,7 +142,7 @@ def login (request):
                 response.set_cookie(key="auth",value=cookie_value,path='/',domain=None)
                 response.set_cookie(key="user_id",value=resultResp['user_id'],path='/',domain=None)
                 response.set_cookie(key="is_consumer",value=is_consumer,path='/',domain=None)
-
+                response.set_cookie(key="username", value=username, path='/', domain=None)
                 #  resultResp['username'] = resp['result']['username']
                 #response.set_cookie(key="username",value=resultResp['username'])
 
@@ -188,6 +196,7 @@ def logout(request):
                 response.delete_cookie('auth')
                 response.delete_cookie('user_id')
                 response.delete_cookie('is_consumer')
+                response.delete_cookie('username')
                 return response
             else:
                 return HttpResponse("Log out failed.")
@@ -206,6 +215,7 @@ def createListing(request):
          # Handle user not logged in while trying to create a listing
          return HttpResponseRedirect(reverse("web_login") + "?next=" + reverse("web_create_listing"))
      is_consumer = (request.COOKIES.get('is_consumer')=="True")
+     username = request.COOKIES.get('username')
      #if not is_consumer:
      #    return HttpResponse("You can only create a listing as a consumer.")
      #else:
@@ -224,7 +234,7 @@ def createListing(request):
                 availability = form.cleaned_data['availability']
                 consumer = int(user_id)
 
-                post_data = {'title': title, 'offered_price': offered_price, 'description': description, 'availability': availability, 'consumer':consumer}
+                post_data = {'title': title, 'offered_price': offered_price, 'description': description, 'availability': availability, 'consumer':consumer, 'authenticator': auth}
                 post_encoded = urllib.parse.urlencode(post_data).encode('utf-8')
 
                 # To do: implement django form and post in exp layer
@@ -241,7 +251,7 @@ def createListing(request):
                 return HttpResponse("Failed to create listing.")
         else:
             form = CreateConsumerRequestForm()
-            return render(request, 'create_listing.html', {'form':form, 'is_consumer':is_consumer})
+            return render(request, 'create_listing.html', {'form':form, 'is_consumer':is_consumer, 'username': username})
      except:
         return HttpResponse("Create listing failed.")
 
