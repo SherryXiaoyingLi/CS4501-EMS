@@ -16,7 +16,7 @@ def index(request):
     logged_in = True
     auth = request.COOKIES.get('auth')
     user_id = request.COOKIES.get('user_id')
-    is_consumer = request.COOKIES.get('is_consumer')
+    is_consumer = (request.COOKIES.get('is_consumer') == "True")
     if not auth:
         logged_in = False
 
@@ -25,7 +25,7 @@ def index(request):
     #response.delete_cookie('user_id')
     #response.delete_cookie('is_consumer')
 
-    context_dict = {'newest_pk': 1, 'highest_pk': 1, 'logged_in':logged_in, 'msg':None}
+    context_dict = {'newest_pk': 1, 'highest_pk': 1, 'logged_in':logged_in, 'is_consumer':is_consumer, 'msg':None}
 
     # make a GET request and parse the returned JSON
     # note, no timeouts, error handling or all the other things needed to do this for real
@@ -85,7 +85,7 @@ def login (request):
  logged_in = True
  auth = request.COOKIES.get('auth')
  user_id = request.COOKIES.get('user_id')
- is_consumer = request.COOKIES.get('is_consumer')
+ is_consumer = (request.COOKIES.get('is_consumer')=="True")
  if not auth:
     logged_in = False
  resultResp= {}
@@ -121,15 +121,19 @@ def login (request):
                 resultResp['is_consumer'] = resp['result']['is_consumer']
                 #cookie_key =resultResp['authenticator']['user_id']
                 cookie_value = resultResp['authenticator']
-
-                response = HttpResponseRedirect(reverse('index'))
-                #next = reverse('home')
+                next = reverse('index')
+                try:
+                 if request.GET['next']:
+                        next = request.GET['next']
+                except:
+                    next = reverse('index')
+                response = HttpResponseRedirect(next)
                 # response = HttpResponseRedirect(next)
 
                 #set cookie and use user_id as cookie key
                 response.set_cookie(key="auth",value=cookie_value,path='/',domain=None)
                 response.set_cookie(key="user_id",value=resultResp['user_id'],path='/',domain=None)
-                response.set_cookie(key="is_consumer",value=resultResp['is_consumer'],path='/',domain=None)
+                response.set_cookie(key="is_consumer",value=is_consumer,path='/',domain=None)
 
                 #  resultResp['username'] = resp['result']['username']
                 #response.set_cookie(key="username",value=resultResp['username'])
@@ -195,6 +199,17 @@ def logout(request):
 def createListing(request):
      resultResp= {}
      response= {}
+     # Try to get the authenticator cookie
+     auth = request.COOKIES.get('auth')
+     # If the authenticator cookie wasn't set...
+     if not auth:
+         # Handle user not logged in while trying to create a listing
+         return HttpResponseRedirect(reverse("web_login") + "?next=" + reverse("web_create_listing"))
+     is_consumer = (request.COOKIES.get('is_consumer')=="True")
+     #if not is_consumer:
+     #    return HttpResponse("You can only create a listing as a consumer.")
+     #else:
+     user_id = request.COOKIES.get('user_id')
      try:
         if request.method =='POST':
             form = CreateConsumerRequestForm(request.POST)
@@ -207,7 +222,7 @@ def createListing(request):
                 offered_price = form.cleaned_data['offered_price']
                 description = form.cleaned_data['description']
                 availability = form.cleaned_data['availability']
-                consumer = 1
+                consumer = int(user_id)
 
                 post_data = {'title': title, 'offered_price': offered_price, 'description': description, 'availability': availability, 'consumer':consumer}
                 post_encoded = urllib.parse.urlencode(post_data).encode('utf-8')
@@ -226,7 +241,7 @@ def createListing(request):
                 return HttpResponse("Failed to create listing.")
         else:
             form = CreateConsumerRequestForm()
-            return render(request, 'create_listing.html', {'form':form})
+            return render(request, 'create_listing.html', {'form':form, 'is_consumer':is_consumer})
      except:
         return HttpResponse("Create listing failed.")
 
@@ -234,6 +249,10 @@ def createListing(request):
 def createConsumer(request):
     resultResp = {}
     response = {}
+    logged_in = True
+    auth = request.COOKIES.get('auth')
+    if not auth:
+        logged_in = False
     try:
         if request.method =='POST':
             form = CreateConsumerForm(request.POST)
@@ -266,7 +285,7 @@ def createConsumer(request):
                 return HttpResponse("Failed to create account.")
         else:
             form = CreateConsumerForm()
-            return render(request, 'create_consumer.html', {'form':form})
+            return render(request, 'create_consumer.html', {'form':form, 'logged_in':logged_in})
     except:
         return HttpResponse("Create account failed.")
 
@@ -274,6 +293,10 @@ def createConsumer(request):
 def createProducer(request):
     resultResp = {}
     response = {}
+    logged_in = True
+    auth = request.COOKIES.get('auth')
+    if not auth:
+        logged_in = False
     try:
         if request.method =='POST':
             form = CreateProducerForm(request.POST)
@@ -307,6 +330,6 @@ def createProducer(request):
                 return HttpResponse("Failed to create account.")
         else:
             form = CreateProducerForm()
-            return render(request, 'create_producer.html', {'form':form})
+            return render(request, 'create_producer.html', {'form':form, 'logged_in':logged_in})
     except:
         return HttpResponse("Create account failed.")

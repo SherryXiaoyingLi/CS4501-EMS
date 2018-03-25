@@ -16,8 +16,6 @@
 
 {% if logged_in %}
     <h4>You are already logged in!
-    {{auth}}
-    <br><a href="/">Home</a><br /></h4>
     
 {% else %}
 <h4>
@@ -38,11 +36,10 @@
         
         <input type="submit" name="submit" value="Submit" />
 
-        <br><a href="/">Home</a><br />
     </form>                                                                           
 </h4>
 {% endif %}
-
+<br><a href="/">Home</a><br /></h4>
     </body>
 </html>
 
