@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .forms import LoginForm, CreateConsumerRequestForm, CreateConsumerForm
+from .forms import LoginForm, CreateConsumerRequestForm, CreateConsumerForm, CreateProducerForm
 from .forms import EnterAuthenticatorForm
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
@@ -227,7 +227,7 @@ def createListing(request):
         else:
             form = CreateConsumerRequestForm()
             return render(request, 'create_listing.html', {'form':form})
-     except Consumer.DoesNotExist:
+     except:
         return HttpResponse("Create listing failed.")
 
 @csrf_exempt
@@ -267,7 +267,7 @@ def createConsumer(request):
         else:
             form = CreateConsumerForm()
             return render(request, 'create_consumer.html', {'form':form})
-    except Consumer.DoesNotExist:
+    except:
         return HttpResponse("Create account failed.")
 
 @csrf_exempt
@@ -306,7 +306,7 @@ def createProducer(request):
             else:
                 return HttpResponse("Failed to create account.")
         else:
-            form = CreateConsumerForm()
+            form = CreateProducerForm()
             return render(request, 'create_producer.html', {'form':form})
-    except Consumer.DoesNotExist:
+    except:
         return HttpResponse("Create account failed.")
