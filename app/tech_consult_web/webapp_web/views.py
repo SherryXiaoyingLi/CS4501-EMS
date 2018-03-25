@@ -191,7 +191,7 @@ def logout(request):
     except:
         return HttpResponse("Log out failed.")
 
-
+@csrf_exempt
 def createListing(request):
      resultResp= {}
      response= {}
@@ -214,12 +214,13 @@ def createListing(request):
 
                 # To do: implement django form and post in exp layer
                 #req = urllib.request.Request('http://exp-api:8000/api/v1/login',data=post_encoded,method='POST')
-                req = urllib.request.Request('http://exp-api:8000/api/v1/createListing')
+                req = urllib.request.Request('http://exp-api:8000/api/v1/createListing', data=post_encoded,method='POST')
                 resp_json = urllib.request.urlopen(req).read().decode('utf-8')
                 resp = json.loads(resp_json)
 
                 if resp['ok']:
-                    response = render(request, "index.html")
+                    pk=resp['result']['pk']
+                    response = HttpResponseRedirect(reverse('web_request_detail', kwargs={'consumerRequest_pk':pk}))
                     return response
             else:
                 return HttpResponse("Failed to create listing.")
@@ -229,6 +230,7 @@ def createListing(request):
      except Consumer.DoesNotExist:
         return HttpResponse("Create listing failed.")
 
+@csrf_exempt
 def createConsumer(request):
     resultResp = {}
     response = {}
@@ -257,7 +259,8 @@ def createConsumer(request):
                 resp = json.loads(resp_json)
 
                 if resp['ok']:
-                    response = render(request, "index.html")
+                    response = HttpResponseRedirect(reverse('index'))
+
                     return response
             else:
                 return HttpResponse("Failed to create account.")
@@ -267,6 +270,7 @@ def createConsumer(request):
     except Consumer.DoesNotExist:
         return HttpResponse("Create account failed.")
 
+@csrf_exempt
 def createProducer(request):
     resultResp = {}
     response = {}

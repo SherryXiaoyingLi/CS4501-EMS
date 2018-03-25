@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.shortcuts import render_to_response
 from .forms import LoginForm
-from .forms import EnterAuthenticatorForm
+from .forms import EnterAuthenticatorForm, CreateConsumerRequestForm
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -196,9 +196,14 @@ def createListing(request):
             form = CreateConsumerRequestForm(request.POST)
 
             if form.is_valid():
-
-                response['ok'] = True
-
+                '''
+                title = 'hiya'
+                offered_price = 2.0
+                description = 'stuff'
+                availability = 'yeah'
+                consumer = 1
+                accepted_producer = 0
+                '''
                 title = form.cleaned_data['title']
                 offered_price = float(form.cleaned_data['offered_price'])
                 description = form.cleaned_data['description']
@@ -206,7 +211,7 @@ def createListing(request):
                 consumer = int(form.cleaned_data['consumer'])
                 accepted_producer = None
 
-                post_data = {'title':title, 'offered_price':offered_price, 'description': description, 'availability':availability, 'consumer':consumer, 'accepted_producer':accepted_producer}
+                post_data = {'title':title, 'offered_price':offered_price, 'description': description, 'availability':availability, 'consumer':consumer}
                 post_encoded = urllib.parse.urlencode(post_data).encode('utf-8')
                 req = urllib.request.Request('http://models-api:8000/api/v1/consumerRequests/create', data=post_encoded, method='POST') #data???
                 resp_json = urllib.request.urlopen(req).read().decode('utf-8')
@@ -214,10 +219,20 @@ def createListing(request):
 
                 if results['ok']:
                     response['ok'] = True
+                    response_data['title'] = results['result']['title']
+                    response_data['offered_price'] = results['result']['offered_price']
+                    response_data['description'] = results['result']['description']
+                    response_data['availability'] = results['result']['availability']
+                    response_data['consumer'] = results['result']['consumer']
+                    response_data['accepted_producer'] = None
+                    response_data['pk'] = results['result']['pk']
                 else:
                     response['ok'] = False
+            else:
+                response['ok'] = False
         else:
-            response['ok'] = False
+            form = CreateConsumerRequestForm()
+            return render(request, 'create_consumer_request.html', {'form': form})
     except Consumer.DoesNotExist:
         response["ok"] = False
 
