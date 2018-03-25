@@ -14,7 +14,7 @@ import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
+PACKAGE_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
@@ -55,7 +55,9 @@ ROOT_URLCONF = 'tech_consult_exp.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates'),
+                      os.path.join(BASE_DIR, 'webapp_exp/templates/webapp_exp'),
+                      os.path.join(PACKAGE_ROOT, 'templates/webapp_exp')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
