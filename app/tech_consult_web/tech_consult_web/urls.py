@@ -23,6 +23,8 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', views.index, name='index'),
     url(r'^request_detail/(?P<consumerRequest_pk>[0-9]+)$', views.request_detail, name='web_request_detail'),
+    url(r'^consumer_detail/(?P<consumer_pk>[0-9]+)$', views.consumer_detail, name='web_consumer_detail'),
+    url(r'^producer_detail/(?P<producer_pk>[0-9]+)$', views.producer_detail, name='web_producer_detail'),
     url(r'^login$',views.login, name='web_login'),
     url(r'^logout$',views.logout),
     url(r'^create_listing$',views.createListing,name='web_create_listing'),
