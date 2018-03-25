@@ -84,6 +84,7 @@ def getRequestDetail(request, consumerRequest_pk):
             response_data['offered_price'] = results['result']['offered_price']
             response_data['timestamp'] = results['result']['timestamp']
             response_data['availability'] = results['result']['availability']
+            response_data['consumer_pk'] = consumer_pk
             response_data['consumer_username'] = results2['result']['username']
             response_data['consumer_email'] = results2['result']['email']
             response_data['consumer_phone'] = results2['result']['phone']
@@ -94,6 +95,7 @@ def getRequestDetail(request, consumerRequest_pk):
                 resp_json3 = urllib.request.urlopen(req3).read().decode('utf-8')
                 results3 = json.loads(resp_json3)
                 response_data['producer_username'] = results3['result']['username']
+                response_data['producer_pk'] = results3['result']['pk']
             else:
                 response_data['producer_username'] = None
 
@@ -105,6 +107,61 @@ def getRequestDetail(request, consumerRequest_pk):
     response['result'] = response_data
     return JsonResponse(response)
 
+# For consumer detail page
+# Returns the consumer's informatopn
+def getConsumerDetail(request, consumer_pk):
+    response = {}
+    response_data = {}
+
+    try:
+
+        req = urllib.request.Request('http://models-api:8000/api/v1/consumers/' + str(consumer_pk))
+        resp_json = urllib.request.urlopen(req).read().decode('utf-8')
+        results = json.loads(resp_json)
+
+        if results['ok'] == True:
+            response['ok'] = True
+            response_data['consumer_username'] = results['result']['username']
+            response_data['full_name'] = results['result']['first_name'] + " " + results['result']['last_name']
+            response_data['email'] = results['result']['email']
+            response_data['phone'] = results['result']['phone']
+
+        else:
+            response['ok'] = False
+    except:
+        response["ok"] = False
+
+    response['result'] = response_data
+    return JsonResponse(response)
+
+# For producer detail page
+# Returns the consumer's informatopn
+def getProducerDetail(request, producer_pk):
+    response = {}
+    response_data = {}
+
+    try:
+
+        req = urllib.request.Request('http://models-api:8000/api/v1/producers/' + str(producer_pk))
+        resp_json = urllib.request.urlopen(req).read().decode('utf-8')
+        results = json.loads(resp_json)
+
+        if results['ok'] == True:
+            response['ok'] = True
+            response_data['producer_username'] = results['result']['username']
+            response_data['full_name'] = results['result']['first_name'] + " " + results['result']['last_name']
+            response_data['email'] = results['result']['email']
+            response_data['phone'] = results['result']['phone']
+            response_data['bio'] = results['result']['bio']
+            response_data['skills'] = results['result']['skills']
+
+        else:
+            response['ok'] = False
+    except:
+        response["ok"] = False
+
+    response['result'] = response_data
+    return JsonResponse(response)
 
 #Login authenticator
 #Take a username and password from client(web f.e/mobile app, etc)

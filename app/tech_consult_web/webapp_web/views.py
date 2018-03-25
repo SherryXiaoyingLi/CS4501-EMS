@@ -4,6 +4,7 @@ from .forms import EnterAuthenticatorForm
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
+from django.contrib import messages
 
 import json
 from django.http import HttpResponse
@@ -26,7 +27,7 @@ def index(request):
     #response.delete_cookie('user_id')
     #response.delete_cookie('is_consumer')
 
-    context_dict = {'newest_pk': 1, 'highest_pk': 1, 'logged_in':logged_in, 'is_consumer':is_consumer, 'username':username, 'msg':None}
+    context_dict = {'newest_pk': 1, 'highest_pk': 1, 'logged_in':logged_in, 'is_consumer':is_consumer, 'username':username, 'user_id':user_id, 'msg':None}
 
     # make a GET request and parse the returned JSON
     # note, no timeouts, error handling or all the other things needed to do this for real
@@ -74,16 +75,88 @@ def request_detail(request, consumerRequest_pk):
         context_dict['offered_price'] = resp['result']['offered_price']
         context_dict['timestamp'] = resp['result']['timestamp']
         context_dict['availability'] = resp['result']['availability']
+        context_dict['consumer_pk'] = resp['result']['consumer_pk']
         context_dict['consumer_username'] = resp['result']['consumer_username']
         context_dict['consumer_email'] = resp['result']['consumer_email']
         context_dict['consumer_phone'] = resp['result']['consumer_phone']
         context_dict['producer_username'] = resp['result']['producer_username']
+        if context_dict['producer_username']:
+            context_dict['producer_pk'] = resp['result']['producer_pk']
         context_dict['logged_in'] = logged_in
+        context_dict['username'] = username
+        context_dict['is_consumer'] = is_consumer
+        context_dict['user_id'] = user_id
         return render(request, "request_detail.html", context_dict)
 
     else:
         return HttpResponse("Consumer request does not exist.")
 
+def consumer_detail(request, consumer_pk):
+    logged_in = True
+    auth = request.COOKIES.get('auth')
+    user_id = request.COOKIES.get('user_id')
+    is_consumer = (request.COOKIES.get('is_consumer') == "True")
+    username = request.COOKIES.get('username')
+    if not auth:
+        logged_in = False
+    context_dict = {'username': 'Marissa', 'full_name': 'Marissa Lee',
+                    'email': "myl2vu@virginia.edu", 'phone': '434-958-2913'}
+
+    req = urllib.request.Request('http://exp-api:8000/api/v1/consumerDetail/' + str(consumer_pk))
+
+    resp_json = urllib.request.urlopen(req).read().decode('utf-8')
+    resp = json.loads(resp_json)
+    print(resp)
+
+    if resp['ok']:
+        context_dict['ok'] = True
+        context_dict['consumer_username'] = resp['result']['consumer_username']
+        context_dict['full_name'] = resp['result']['full_name']
+        context_dict['email'] = resp['result']['email']
+        context_dict['phone'] = resp['result']['phone']
+        context_dict['logged_in'] = logged_in
+        context_dict['username'] = username
+        context_dict['user_id'] = user_id
+        context_dict['is_consumer'] = is_consumer
+
+    else:
+        context_dict['ok'] = False
+        context_dict['msg'] = "Consumer does not exist."
+    return render(request, "consumer_detail.html", context_dict)
+
+def producer_detail(request, producer_pk):
+    logged_in = True
+    auth = request.COOKIES.get('auth')
+    user_id = request.COOKIES.get('user_id')
+    is_consumer = (request.COOKIES.get('is_consumer') == "True")
+    username = request.COOKIES.get('username')
+    if not auth:
+        logged_in = False
+    context_dict = {'username': 'Marissa', 'full_name': 'Marissa Lee',
+                    'email': "myl2vu@virginia.edu", 'phone': '434-958-2913', 'bio':'I am a student', 'skills': 'Django, AWS'}
+
+    req = urllib.request.Request('http://exp-api:8000/api/v1/producerDetail/' + str(producer_pk))
+
+    resp_json = urllib.request.urlopen(req).read().decode('utf-8')
+    resp = json.loads(resp_json)
+    print(resp)
+
+    if resp['ok']:
+        context_dict['ok']=True
+        context_dict['producer_username'] = resp['result']['producer_username']
+        context_dict['full_name'] = resp['result']['full_name']
+        context_dict['email'] = resp['result']['email']
+        context_dict['phone'] = resp['result']['phone']
+        context_dict['bio'] = resp['result']['bio']
+        context_dict['skills'] = resp['result']['skills']
+        context_dict['logged_in'] = logged_in
+        context_dict['username'] = username
+        context_dict['user_id'] = user_id
+        context_dict['is_consumer'] = is_consumer
+    else:
+        context_dict['ok'] = False
+        context_dict['msg'] = "Producer does not exist."
+    return render(request, "producer_detail.html", context_dict)
 
 #for login page
 #read login info, pass to log in exp srvc, receive authenticator back if password correct
@@ -138,6 +211,8 @@ def login (request):
                 response = HttpResponseRedirect(next)
                 # response = HttpResponseRedirect(next)
 
+                #Using django messages based on https://stackoverflow.com/questions/1463489/how-do-i-pass-template-context-information-when-using-httpresponseredirect-in-dj
+                messages.success(request, "You successfully logged in!")
                 #set cookie and use user_id as cookie key
                 response.set_cookie(key="auth",value=cookie_value,path='/',domain=None)
                 response.set_cookie(key="user_id",value=resultResp['user_id'],path='/',domain=None)
@@ -148,21 +223,24 @@ def login (request):
 
                 return response
             else:
-                return HttpResponse("Invalid credentials. Check your username and password or sign up first.")
+                response = HttpResponseRedirect(reverse("web_login"))
+                messages.error(request, "Invalid credentials. Check your username and password or sign up first.")
+                return response
         else:
-            return HttpResponse("Log in validation failed. Please create account first.")
+            response = HttpResponseRedirect(reverse("web_login"))
+            messages.error(request, "Invalid credentials. Check your username and password or sign up first.")
+            return response
     else:
         form = LoginForm()
         return render(request, 'login.html', {'form':form , 'logged_in':logged_in, 'auth':auth, 'user_id':user_id, 'is_consumer':is_consumer})
  except:
-    return HttpResponse("Log in validation failed. Please create account first.")
+     response = HttpResponseRedirect(reverse("web_login"))
+     messages.error(request, "Invalid credentials. Check your username and password or sign up first.")
+     return response
 
 
 def logout(request):
-    #response = render(request, 'logout.html')
-    #response.delete_cookie('auth')
-    #response.delete_cookie('user_id')
-    #response.delete_cookie('is_consumer')
+
 
  #this variable shows the current status of user
  logged_in = True
@@ -238,7 +316,6 @@ def createListing(request):
                 post_encoded = urllib.parse.urlencode(post_data).encode('utf-8')
 
                 # To do: implement django form and post in exp layer
-                #req = urllib.request.Request('http://exp-api:8000/api/v1/login',data=post_encoded,method='POST')
                 req = urllib.request.Request('http://exp-api:8000/api/v1/createListing', data=post_encoded,method='POST')
                 resp_json = urllib.request.urlopen(req).read().decode('utf-8')
                 resp = json.loads(resp_json)
@@ -246,9 +323,12 @@ def createListing(request):
                 if resp['ok']:
                     pk=resp['result']['pk']
                     response = HttpResponseRedirect(reverse('web_request_detail', kwargs={'consumerRequest_pk':pk}))
+                    messages.success(request, "You successfully created a listing.")
                     return response
             else:
-                return HttpResponse("Failed to create listing.")
+                response = HttpResponseRedirect(reverse("web_create_listing"))
+                messages.failure(request, "Invalid authenticator.")
+                return response
         else:
             form = CreateConsumerRequestForm()
             return render(request, 'create_listing.html', {'form':form, 'is_consumer':is_consumer, 'username': username})
@@ -288,8 +368,9 @@ def createConsumer(request):
                 resp = json.loads(resp_json)
 
                 if resp['ok']:
-                    response = HttpResponseRedirect(reverse('index'))
-
+                    pk = resp['result']['pk']
+                    response = HttpResponseRedirect(reverse('web_consumer_detail', kwargs={'consumer_pk': pk}))
+                    messages.success(request, "You successfully created a consumer account.")
                     return response
             else:
                 return HttpResponse("Failed to create account.")
@@ -328,13 +409,14 @@ def createProducer(request):
                 post_encoded = urllib.parse.urlencode(post_data).encode('utf-8')
 
                 # To do: implement django form and post in exp layer
-                #req = urllib.request.Request('http://exp-api:8000/api/v1/login',data=post_encoded,method='POST')
                 req = urllib.request.Request('http://exp-api:8000/api/v1/createProducer', data=post_encoded,method='POST')
                 resp_json = urllib.request.urlopen(req).read().decode('utf-8')
                 resp = json.loads(resp_json)
 
                 if resp['ok']:
-                    response = render(request, "index.html")
+                    pk = resp['result']['pk']
+                    response = HttpResponseRedirect(reverse('web_producer_detail', kwargs={'producer_pk': pk}))
+                    messages.success(request, "You successfully created a producer account.")
                     return response
             else:
                 return HttpResponse("Failed to create account.")
