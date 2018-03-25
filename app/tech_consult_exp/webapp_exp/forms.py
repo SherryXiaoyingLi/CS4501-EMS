@@ -12,6 +12,7 @@ class CreateConsumerRequestForm(forms.Form):
     description = forms.CharField(max_length=200, help_text="Description: ")
     availability = forms.CharField(max_length=200, help_text="Availability: ")
     consumer = forms.IntegerField(help_text="Consumer PK: ")
+    authenticator = forms.CharField(max_length=256, help_text="Authenticator: ")
 
 # Form to delete an authenticator
 class EnterAuthenticatorForm(forms.Form):

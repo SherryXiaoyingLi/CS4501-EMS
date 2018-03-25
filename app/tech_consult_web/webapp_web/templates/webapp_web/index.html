@@ -15,13 +15,14 @@
     <h2>CS 4501. Elliott Kim, Marissa Lee, Sherry Li</h2>
     {% if logged_in %}
         <br><a href="/logout">Log out</a><br />
+        Welcome, {{username}}! <br />
         {% if is_consumer %}
             <br><a href="/create_listing">Create listing</a><br />
         {% endif %}
     {% else %}
         <br><a href="/login">Log in</a><br />
         <br><a href="/create_consumer">Create consumer account</a><br />
-        <br><a href="/create_prdocuer">Create producer account</a><br />
+        <br><a href="/create_producer">Create producer account</a><br />
     {% endif %}
     <li><a href="/request_detail/{{ highest_pk }}"><h3>Highest Offers</h3></a></li>
     <li><a href="/request_detail/{{ newest_pk }}"><h3>Newest Consumer Requests</h3></a></li>

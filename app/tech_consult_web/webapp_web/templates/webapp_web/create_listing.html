@@ -13,6 +13,8 @@
 
 <body>
     <h1>Technology Consultation</h1>
+        <br><a href="/logout">Log out</a><br />
+        Welcome, {{username}}! <br />
     <h3><center>Create Listing</center></h3>
 
 {% if is_consumer %}
@@ -39,7 +41,7 @@
 
 {% else %}
      <h4>You cannot create a listing as a producer.</h4>
-    <br><a href="/logout">Log out</a><br />
+
 {% endif %}
     <br><a href="/">Home</a><br />
     </body>
