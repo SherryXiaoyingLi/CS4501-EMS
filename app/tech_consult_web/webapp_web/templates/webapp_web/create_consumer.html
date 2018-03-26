@@ -14,33 +14,38 @@
 <body>
     <h1>Technology Consultation</h1>
     <h2>CS 4501. Elliott Kim, Marissa Lee, Sherry Li</h2>
+    {% if messages %}
+      {% for message in messages %}
+        {{ message }}
+      {% endfor %}
+    {% endif %}
     <h3><b><center>Create Consumer</center></b></h3>
 
-{% if logged_in %}
-    <h4>You are already logged in!</h4>
-    <br><a href="/logout">Log out</a><br /></h4>
-{% else %}
-<h4>
+    {% if logged_in %}
+        <h4>You are already logged in!</h4>
+        <br><a href="/logout">Log out</a><br /></h4>
+    {% else %}
+    <h4>
 
-    <form id="create_consumer_form" method="post" class="form-inline" action="">
+        <form id="create_consumer_form" method="post" class="form-inline" action="">
 
-        {% csrf_token %}
-        {% for hidden in form.hidden_fields %}
-            {{ hidden }}
-        {% endfor %}
+            {% csrf_token %}
+            {% for hidden in form.hidden_fields %}
+                {{ hidden }}
+            {% endfor %}
 
-        {% for field in form.visible_fields %}
-            {{ field.errors }}
-            {{ field.help_text }}
-            <p>{{ field }}</p>
-        {% endfor %}
+            {% for field in form.visible_fields %}
+                {{ field.errors }}
+                {{ field.help_text }}
+                <p>{{ field }}</p>
+            {% endfor %}
 
 
-        <input type="submit" name="submit" value="Submit" />
+            <input type="submit" name="submit" value="Submit" />
 
-    </form>
-</h4>
-{% endif %}
-<br><a href="/">Home</a><br /></h4>
+        </form>
+    </h4>
+    {% endif %}
+    <br><a href="/">Home</a><br /></h4>
     </body>
 </html>

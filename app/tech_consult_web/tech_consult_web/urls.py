@@ -27,7 +27,7 @@ urlpatterns = [
     url(r'^producer_detail/(?P<producer_pk>[0-9]+)$', views.producer_detail, name='web_producer_detail'),
     url(r'^login$',views.login, name='web_login'),
     url(r'^logout$',views.logout),
-    url(r'^create_listing$',views.createListing,name='web_create_listing'),
-    url(r'^create_consumer$',views.createConsumer),
-    url(r'^create_producer$',views.createProducer),
+    url(r'^create_listing$',views.createListing, name='web_create_listing'),
+    url(r'^create_consumer$',views.createConsumer, name='web_create_consumer'),
+    url(r'^create_producer$',views.createProducer, name='web_create_producer'),
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -14,8 +14,14 @@
 <body>
     <h1>Technology Consultation</h1>
     <h2>CS 4501. Elliott Kim, Marissa Lee, Sherry Li</h2>
-        <br><a href="/logout">Log out</a><br />
-        Welcome, {{username}}! <br />
+    <br><a href="/logout">Log out</a><br />
+    Welcome,
+    {% if is_consumer %}
+        <a href="/consumer_detail/{{ user_id }}">{{username}}</a>! <br />
+    {% else %}
+        <a href="/producer_detail/{{ user_id }}">{{username}}</a>! <br />
+    {% endif %}
+
     <h3><center><b>Create Listing</b></center></h3>
 
 {% if is_consumer %}
