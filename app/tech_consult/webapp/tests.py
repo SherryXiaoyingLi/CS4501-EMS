@@ -119,6 +119,16 @@ class CreatedTestCase(TestCase):
         # checks that response contains value with same pk as created
         self.assertEquals(response.json()['result']['pk'], created_pk)
 
+    def test_create_consumer_with_duplicate_username(self):
+        post_data = {'username': 'mylee3', 'password': 'password', 'first_name': 'Marissa', 'last_name': 'Lee', 'email': 'm@gmail.com', 'phone': '111-111-1111'}
+
+        # creates the consumer
+        response = self.client.post(reverse('create_consumer'), post_data)
+
+        # checks that response contains value with same pk as created
+        self.assertFalse(response.json()['ok'])
+
+
     def test_create_producer(self):
         post_data = {'username': 'megan', 'password': 'supersecret', 'first_name': 'Megan', 'last_name': 'Smith', 'email': 'msmith@hotmail.com', 'phone': '753-123-1254', 'bio': 'I am a senior at GMU.', 'skills': 'web design'}
 
@@ -133,6 +143,14 @@ class CreatedTestCase(TestCase):
 
         # checks that response contains value with same pk as created
         self.assertEquals(response.json()['result']['pk'], created_pk)
+
+    def test_create_producer_with_duplicate_username(self):
+        post_data = {'username': 'shardi3', 'password': 'supersecret', 'first_name': 'Megan', 'last_name': 'Smith', 'email': 'msmith@hotmail.com', 'phone': '753-123-1254', 'bio': 'I am a senior at GMU.', 'skills': 'web design'}
+
+        response = self.client.post(reverse('create_producer'), post_data)
+
+        # checks that response contains value with same pk as created
+        self.assertFalse(response.json()['ok'])
 
     def test_create_review(self):
         post_data = {'producer': 1, 'author': 3, 'rating': 4, 'comment': 'mylee3 got the job done well enough.'}
@@ -728,6 +746,18 @@ class AuthenticatorTestCase(TestCase):
 
         # checks that response contains value with same pk as created
         self.assertEquals(response.json()['result'], results)
+
+    def test_check_password_of_consumer(self):
+        consumer_id = 1
+        password = "ilikeseals"
+        consumer = Consumer.objects.get(pk=consumer_id)
+        self.assertTrue(check_password(password, consumer.password))
+
+    def test_check_password_of_producer(self):
+        producer_id = 1
+        password = "password0"
+        producer = Producer.objects.get(pk=producer_id)
+        self.assertTrue(check_password(password, producer.password))
 
     def test_login_producer_invalid_password(self):
         post_data = {'username': 'eavery', 'password': 'password', 'is_consumer': False}
