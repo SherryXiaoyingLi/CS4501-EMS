@@ -4,7 +4,7 @@ from django import forms
 class LoginForm(forms.Form):
     username = forms.CharField(max_length=200, help_text="Username: ")
     password = forms.CharField(widget=forms.PasswordInput(), max_length=200, help_text="Password: ")
-    is_consumer = forms.BooleanField(required=False)
+    is_consumer = forms.BooleanField(required=False, help_text="Is Consumer:")
 
 class CreateConsumerRequestForm(forms.Form):
     title = forms.CharField(max_length=200, help_text="Title: ")

@@ -88,12 +88,25 @@ All fields need to be entered for CREATE, but not UPDATE
 
 ## Services
 
+* 8002/api/v1/login
+* 8002/api/v1/logout
 * 8002/api/v1/getNewestRequestPk
 * 8002/api/v1/getHighestRequestPk
 * 8002/api/v1/requestDetail/1
-
+* 8002/api/v1/consumerDetail/1
+* 8002/api/v1/producerDetail/1
+* 8002/api/v1/createListing, post_data={consumer, authenticator, title, description, offered_price, availability}
+* 8002/api/v1/createConsumer, post_data={username, password, first_name, last_name, email, phone}
+* 8002/api/v1/createProducer, post_data={username, password, first_name, last_name, email, phone, bio, skills}
 
 ## Web
 
 * 8000/
+* 8000/login
+* 8000/logout
 * 8000/request_detail/1
+* 8000/consumer_detail/1
+* 8000/producer_detail/1
+* 8000/create_listing
+* 8000/create_consumer
+* 8000/create_producer

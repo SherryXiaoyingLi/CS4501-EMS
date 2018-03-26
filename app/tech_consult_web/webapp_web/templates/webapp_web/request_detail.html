@@ -27,21 +27,25 @@
         <br><a href="/login">Log in</a><br />
     {% endif %}
     <h3><center><b>Request Details</b></center></h3>
-<h4>
-    <p>Title: {{title}}</p>
-    <p>Description: {{description}} </p>
-    <p>Offered Price: ${{offered_price}}</p>
-    <p>Timestamp: {{timestamp}} </p>
-    <p>Consumer Username: <a href="/consumer_detail/{{ consumer_pk }}">{{consumer_username}}</a></p>
-    <p>Consumer Email: {{consumer_email}}</p>
-    <p>Consumer Phone: {{consumer_phone}}</p>
-    <p>Availability: {{availability}} </p>
-    {% if producer_username %}
-        <p>Accepted Consultant Username(if any): <a href="/producer_detail/{{ producer_pk }}">{{producer_username}}</a></p>
+    {% if ok %}
+    <h4>
+        <p>Title: {{title}}</p>
+        <p>Description: {{description}} </p>
+        <p>Offered Price: ${{offered_price}}</p>
+        <p>Timestamp: {{timestamp}} </p>
+        <p>Consumer Username: <a href="/consumer_detail/{{ consumer_pk }}">{{consumer_username}}</a></p>
+        <p>Consumer Email: {{consumer_email}}</p>
+        <p>Consumer Phone: {{consumer_phone}}</p>
+        <p>Availability: {{availability}} </p>
+        {% if producer_username %}
+            <p>Accepted Consultant Username(if any): <a href="/producer_detail/{{ producer_pk }}">{{producer_username}}</a></p>
+        {% else %}
+            <p>Accepted Consultant Username(if any):</p>
+        {% endif %}
+    </h4>
     {% else %}
-        <p>Accepted Consultant Username(if any):</p>
+        <h4>{{ msg }}</h4>
     {% endif %}
-</h4>
-<br><a href="/">Home</a><br /></h4>
+    <br><a href="/">Home</a><br /></h4>
 </body>
 </html>

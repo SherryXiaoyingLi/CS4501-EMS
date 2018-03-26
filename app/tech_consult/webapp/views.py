@@ -68,31 +68,38 @@ def create_consumer (request):
 
             if form.is_valid():
 
-                response['ok'] = True
+                #Checking if username exists
+                try:
+                    c=Consumer.objects.get(username=form.cleaned_data['username'])
+                    response['ok'] = False
+                    response['msg'] = "Consumer with username " + form.cleaned_data['username'] + " exists."
+                except:
+                    response['ok'] = True
 
-                # Creating the consumer based on form input
-                consumer = Consumer()
-                consumer.username = form.cleaned_data['username']
-                password = form.cleaned_data['password']
-                consumer.password = make_password(password, salt=None, hasher='default')
-                consumer.first_name = form.cleaned_data['first_name']
-                consumer.last_name = form.cleaned_data['last_name']
-                consumer.phone = form.cleaned_data['phone']
-                consumer.email = form.cleaned_data['email']
+                    # Creating the consumer based on form input
+                    consumer = Consumer()
+                    consumer.username = form.cleaned_data['username']
+                    password = form.cleaned_data['password']
+                    consumer.password = make_password(password, salt=None, hasher='default')
+                    consumer.first_name = form.cleaned_data['first_name']
+                    consumer.last_name = form.cleaned_data['last_name']
+                    consumer.phone = form.cleaned_data['phone']
+                    consumer.email = form.cleaned_data['email']
 
-                consumer.save()
+                    consumer.save()
 
-                # Adding the created consumer's data to json response
-                response_data['pk'] = consumer.pk
-                response_data['username'] = consumer.username
-                response_data['password'] = consumer.password
-                response_data['first_name'] = consumer.first_name
-                response_data['last_name'] = consumer.last_name
-                response_data['phone'] = consumer.phone
-                response_data['email'] = consumer.email
+                    # Adding the created consumer's data to json response
+                    response_data['pk'] = consumer.pk
+                    response_data['username'] = consumer.username
+                    response_data['password'] = consumer.password
+                    response_data['first_name'] = consumer.first_name
+                    response_data['last_name'] = consumer.last_name
+                    response_data['phone'] = consumer.phone
+                    response_data['email'] = consumer.email
 
             else:
                 response['ok'] = False
+                response['msg'] = "Invalid data sent to form."
 
             response['result'] = response_data
 
@@ -105,7 +112,7 @@ def create_consumer (request):
             return render(request, 'update_consumer.html', {'form': form, 'update': False})
     except:
         response['ok'] = False
-
+        response['msg'] = "Error with creating consumer."
         response['result'] = response_data
 
 
@@ -125,37 +132,43 @@ def update_consumer (request, consumer_pk):
 
             if form.is_valid():
 
-                response['ok'] = True
+                # Checking if username exists
+                try:
+                    c = Consumer.objects.get(username=form.cleaned_data['username'])
+                    response['ok'] = False
+                    response['msg'] = "Consumer with username " + form.cleaned_data['username'] + " exists."
+                except:
+                    response['ok'] = True
 
-                # Updating the consumer based on form input, only for filled fields
-                if form.cleaned_data['username']:
-                    consumer.username = form.cleaned_data['username']
-                if form.cleaned_data['password']:
-                    password = form.cleaned_data['password']
-                    consumer.password = make_password(password, salt=None, hasher='default')
-                if form.cleaned_data['first_name']:
-                    consumer.first_name = form.cleaned_data['first_name']
-                if form.cleaned_data['last_name']:
-                    consumer.last_name = form.cleaned_data['last_name']
-                if form.cleaned_data['phone']:
-                    consumer.phone = form.cleaned_data['phone']
-                if form.cleaned_data['email']:
-                    consumer.email = form.cleaned_data['email']
+                    # Updating the consumer based on form input, only for filled fields
+                    if form.cleaned_data['username']:
+                        consumer.username = form.cleaned_data['username']
+                    if form.cleaned_data['password']:
+                        password = form.cleaned_data['password']
+                        consumer.password = make_password(password, salt=None, hasher='default')
+                    if form.cleaned_data['first_name']:
+                        consumer.first_name = form.cleaned_data['first_name']
+                    if form.cleaned_data['last_name']:
+                        consumer.last_name = form.cleaned_data['last_name']
+                    if form.cleaned_data['phone']:
+                        consumer.phone = form.cleaned_data['phone']
+                    if form.cleaned_data['email']:
+                        consumer.email = form.cleaned_data['email']
 
-                consumer.save()
+                    consumer.save()
 
-                # Adding the updated consumer's data to json response
-                response_data['pk'] = consumer.pk
-                response_data['username'] = consumer.username
-                response_data['password'] = consumer.password
-                response_data['first_name'] = consumer.first_name
-                response_data['last_name'] = consumer.last_name
-                response_data['phone'] = consumer.phone
-                response_data['email'] = consumer.email
+                    # Adding the updated consumer's data to json response
+                    response_data['pk'] = consumer.pk
+                    response_data['username'] = consumer.username
+                    response_data['password'] = consumer.password
+                    response_data['first_name'] = consumer.first_name
+                    response_data['last_name'] = consumer.last_name
+                    response_data['phone'] = consumer.phone
+                    response_data['email'] = consumer.email
 
             else:
                 response['ok'] = False
-
+                response['msg'] = "Invalid data sent to form."
             response['result'] = response_data
 
             return JsonResponse(response)
@@ -167,7 +180,7 @@ def update_consumer (request, consumer_pk):
 
     except:
         response['ok'] = False
-
+        response['msg'] = "Error with updating consumer."
         response['result'] = response_data
 
 
@@ -238,36 +251,42 @@ def create_producer (request):
 
         if form.is_valid():
 
-            response['ok'] = True
+            # Checking if username exists
+            try:
+                p = Producer.objects.get(username=form.cleaned_data['username'])
+                response['ok'] = False
+                response['msg'] = "Producer with username " + form.cleaned_data['username'] + " exists."
+            except:
+                response['ok'] = True
 
-            # Creating the producer based on form input
-            producer = Producer()
-            producer.username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
-            producer.password = make_password(password, salt=None, hasher='default')
-            producer.first_name = form.cleaned_data['first_name']
-            producer.last_name = form.cleaned_data['last_name']
-            producer.phone = form.cleaned_data['phone']
-            producer.email = form.cleaned_data['email']
-            producer.bio = form.cleaned_data['bio']
-            producer.skills = form.cleaned_data['skills']
+                # Creating the producer based on form input
+                producer = Producer()
+                producer.username = form.cleaned_data['username']
+                password = form.cleaned_data['password']
+                producer.password = make_password(password, salt=None, hasher='default')
+                producer.first_name = form.cleaned_data['first_name']
+                producer.last_name = form.cleaned_data['last_name']
+                producer.phone = form.cleaned_data['phone']
+                producer.email = form.cleaned_data['email']
+                producer.bio = form.cleaned_data['bio']
+                producer.skills = form.cleaned_data['skills']
 
-            producer.save()
+                producer.save()
 
-            # Adding the created producer's data to json response
-            response_data['pk'] = producer.pk
-            response_data['username'] = producer.username
-            response_data['password'] = producer.password
-            response_data['first_name'] = producer.first_name
-            response_data['last_name'] = producer.last_name
-            response_data['phone'] = producer.phone
-            response_data['email'] = producer.email
-            response_data['bio'] = producer.bio
-            response_data['skills'] = producer.skills
+                # Adding the created producer's data to json response
+                response_data['pk'] = producer.pk
+                response_data['username'] = producer.username
+                response_data['password'] = producer.password
+                response_data['first_name'] = producer.first_name
+                response_data['last_name'] = producer.last_name
+                response_data['phone'] = producer.phone
+                response_data['email'] = producer.email
+                response_data['bio'] = producer.bio
+                response_data['skills'] = producer.skills
 
         else:
             response['ok'] = False
-
+            response['msg'] = "Invalid data sent to form."
         response['result'] = response_data
 
         return JsonResponse(response)
@@ -278,7 +297,7 @@ def create_producer (request):
         return render(request, 'update_producer.html', {'form': form, 'update': False})
     except:
         response['ok'] = False
-
+        response['msg'] = "Error with creating producer."
         response['result'] = response_data
 
     return JsonResponse(response)
@@ -296,43 +315,49 @@ def update_producer (request, producer_pk):
 
             if form.is_valid():
 
-                response['ok'] = True
+                # Checking if username exists
+                try:
+                    p = Producer.objects.get(username=form.cleaned_data['username'])
+                    response['ok'] = False
+                    response['msg'] = "Producer with username " + form.cleaned_data['username'] + " exists."
+                except:
+                    response['ok'] = True
 
-                # Updating the producer based on form input, only for filled fields
-                if form.cleaned_data['username']:
-                    producer.username = form.cleaned_data['username']
-                if form.cleaned_data['password']:
-                    password = form.cleaned_data['password']
-                    producer.password = make_password(password, salt=None, hasher='default')
-                if form.cleaned_data['first_name']:
-                    producer.first_name = form.cleaned_data['first_name']
-                if form.cleaned_data['last_name']:
-                    producer.last_name = form.cleaned_data['last_name']
-                if form.cleaned_data['phone']:
-                    producer.phone = form.cleaned_data['phone']
-                if form.cleaned_data['email']:
-                    producer.email = form.cleaned_data['email']
-                if form.cleaned_data['bio']:
-                    producer.bio = form.cleaned_data['bio']
-                if form.cleaned_data['skills']:
-                    producer.skills = form.cleaned_data['skills']
+                    # Updating the producer based on form input, only for filled fields
+                    if form.cleaned_data['username']:
+                        producer.username = form.cleaned_data['username']
+                    if form.cleaned_data['password']:
+                        password = form.cleaned_data['password']
+                        producer.password = make_password(password, salt=None, hasher='default')
+                    if form.cleaned_data['first_name']:
+                        producer.first_name = form.cleaned_data['first_name']
+                    if form.cleaned_data['last_name']:
+                        producer.last_name = form.cleaned_data['last_name']
+                    if form.cleaned_data['phone']:
+                        producer.phone = form.cleaned_data['phone']
+                    if form.cleaned_data['email']:
+                        producer.email = form.cleaned_data['email']
+                    if form.cleaned_data['bio']:
+                        producer.bio = form.cleaned_data['bio']
+                    if form.cleaned_data['skills']:
+                        producer.skills = form.cleaned_data['skills']
 
-                producer.save()
+                    producer.save()
 
-                # Adding the updated producer's data to json response
-                response_data['pk'] = producer.pk
-                response_data['username'] = producer.username
-                response_data['password'] = producer.password
-                response_data['first_name'] = producer.first_name
-                response_data['last_name'] = producer.last_name
-                response_data['phone'] = producer.phone
-                response_data['email'] = producer.email
-                response_data['bio'] = producer.bio
-                response_data['skills'] = producer.skills
+                    # Adding the updated producer's data to json response
+                    response_data['pk'] = producer.pk
+                    response_data['username'] = producer.username
+                    response_data['password'] = producer.password
+                    response_data['first_name'] = producer.first_name
+                    response_data['last_name'] = producer.last_name
+                    response_data['phone'] = producer.phone
+                    response_data['email'] = producer.email
+                    response_data['bio'] = producer.bio
+                    response_data['skills'] = producer.skills
 
             else:
                 response['ok'] = False
-
+                response['msg'] = "Invalid data sent to form."
             response['result'] = response_data
 
             return JsonResponse(response)
@@ -344,7 +369,7 @@ def update_producer (request, producer_pk):
 
     except:
         response['ok'] = False
-
+        response['msg'] = "Error with updating producer."
         response['result'] = response_data
 
     return JsonResponse(response)

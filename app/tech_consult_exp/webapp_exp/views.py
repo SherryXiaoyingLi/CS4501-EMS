@@ -295,16 +295,19 @@ def createListing(request):
                         response_data['pk'] = results2['result']['pk']
                     else:
                         response['ok'] = False
+                        response['msg'] = "Error with creating listing in the experience layer."
                 else:
                     response['ok'] = False
-                    response['msg'] = "Invalid authenticator"
+                    response['msg'] = "Invalid authenticator."
             else:
                 response['ok'] = False
+                response['msg'] = "Invalid data sent to form in the experience layer."
         else:
             form = CreateConsumerRequestForm()
             return render(request, 'create_consumer_request.html', {'form': form})
     except:
         response["ok"] = False
+        response['msg'] = "Error with creating listing in the exp layer."
 
     response['result'] = response_data
     return JsonResponse(response)
@@ -343,13 +346,16 @@ def createConsumer(request):
                     response_data['pk'] = results['result']['pk']
                 else:
                     response['ok'] = False
+                    response['msg'] = results['msg']
             else:
                 response['ok'] = False
+                response['msg'] = "Invalid data sent to form in the experience layer."
         else:
             form = CreateConsumerForm()
             return render(request, 'create_consumer.html', {'form': form})
     except:
         response["ok"] = False
+        response['msg'] = "Error with creating consumer in the experience layer"
 
     response['result'] = response_data
     return JsonResponse(response)
@@ -392,13 +398,15 @@ def createProducer(request):
                     response_data['pk'] = results['result']['pk']
                 else:
                     response['ok'] = False
+                    response['msg'] = results['msg']
             else:
                 response['ok'] = False
+                response['msg'] = "Invalid data sent to form in the experience layer."
         else:
             form = CreateProducerForm()
             return render(request, 'create_producer.html', {'form': form})
     except:
         response["ok"] = False
-
+        response['msg'] = "Error with creating producer in the experience layer"
     response['result'] = response_data
     return JsonResponse(response)

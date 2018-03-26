@@ -69,7 +69,7 @@ def request_detail(request, consumerRequest_pk):
     print(resp)
 
     if resp['ok']:
-
+        context_dict['ok'] = True
         context_dict['title'] = resp['result']['title']
         context_dict['description'] = resp['result']['description']
         context_dict['offered_price'] = resp['result']['offered_price']
@@ -89,7 +89,9 @@ def request_detail(request, consumerRequest_pk):
         return render(request, "request_detail.html", context_dict)
 
     else:
-        return HttpResponse("Consumer request does not exist.")
+        context_dict['ok'] = False
+        context_dict['msg'] = "Listing does not exist."
+        return render(request, "request_detail.html", context_dict)
 
 def consumer_detail(request, consumer_pk):
     logged_in = True
@@ -325,15 +327,21 @@ def createListing(request):
                     response = HttpResponseRedirect(reverse('web_request_detail', kwargs={'consumerRequest_pk':pk}))
                     messages.success(request, "You successfully created a listing.")
                     return response
+                else:
+                    response = HttpResponseRedirect(reverse('web_create_listing'))
+                    messages.error(request, resp['msg'])
+                    return response
             else:
-                response = HttpResponseRedirect(reverse("web_create_listing"))
-                messages.failure(request, "Invalid authenticator.")
+                response = HttpResponseRedirect(reverse('web_create_listing'))
+                messages.error(request, "Invalid data sent to form in the frontend.")
                 return response
         else:
             form = CreateConsumerRequestForm()
             return render(request, 'create_listing.html', {'form':form, 'is_consumer':is_consumer, 'username': username})
      except:
-        return HttpResponse("Create listing failed.")
+         response = HttpResponseRedirect(reverse('web_create_listing'))
+         messages.error(request, "Error with creating listing in the frontend.")
+         return response
 
 @csrf_exempt
 def createConsumer(request):
@@ -372,13 +380,21 @@ def createConsumer(request):
                     response = HttpResponseRedirect(reverse('web_consumer_detail', kwargs={'consumer_pk': pk}))
                     messages.success(request, "You successfully created a consumer account.")
                     return response
+                else:
+                    response = HttpResponseRedirect(reverse('web_create_consumer'))
+                    messages.error(request, resp['msg'])
+                    return response
             else:
-                return HttpResponse("Failed to create account.")
+                response = HttpResponseRedirect(reverse('web_create_consumer'))
+                messages.error(request, "Invalid data sent to form in web layer.")
+                return response
         else:
             form = CreateConsumerForm()
             return render(request, 'create_consumer.html', {'form':form, 'logged_in':logged_in})
     except:
-        return HttpResponse("Create account failed.")
+        response = HttpResponseRedirect(reverse('web_create_consumer'))
+        messages.error(request, "Error with creating new consumer account.")
+        return response
 
 @csrf_exempt
 def createProducer(request):
@@ -418,10 +434,18 @@ def createProducer(request):
                     response = HttpResponseRedirect(reverse('web_producer_detail', kwargs={'producer_pk': pk}))
                     messages.success(request, "You successfully created a producer account.")
                     return response
+                else:
+                    response = HttpResponseRedirect(reverse('web_create_producer'))
+                    messages.error(request, resp['msg'])
+                    return response
             else:
-                return HttpResponse("Failed to create account.")
+                response = HttpResponseRedirect(reverse('web_create_producer'))
+                messages.error(request, "Invalid data sent to form in frontend.")
+                return response
         else:
             form = CreateProducerForm()
             return render(request, 'create_producer.html', {'form':form, 'logged_in':logged_in})
     except:
-        return HttpResponse("Create account failed.")
+        response = HttpResponseRedirect(reverse('web_create_producer'))
+        messages.error(request, "Error with creating new producer account.")
+        return response
