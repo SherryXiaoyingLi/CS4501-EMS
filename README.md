@@ -4,7 +4,7 @@
 * Marissa Lee (myl2vu) - Shardi3
 * Sherry Li (xl2gs) - LiXiaoying
 
-# Project 4
+# Project 5
 
 ## Models
 
@@ -98,6 +98,7 @@ All fields need to be entered for CREATE, but not UPDATE
 * 8002/api/v1/createListing, post_data={consumer, authenticator, title, description, offered_price, availability}
 * 8002/api/v1/createConsumer, post_data={username, password, first_name, last_name, email, phone}
 * 8002/api/v1/createProducer, post_data={username, password, first_name, last_name, email, phone, bio, skills}
+* 8002/api/v1/search, post_data={query}
 
 ## Web
 
@@ -110,3 +111,4 @@ All fields need to be entered for CREATE, but not UPDATE
 * 8000/create_listing
 * 8000/create_consumer
 * 8000/create_producer
+* 8000/search_results

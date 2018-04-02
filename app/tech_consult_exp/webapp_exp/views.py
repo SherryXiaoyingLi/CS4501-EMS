@@ -1,10 +1,12 @@
 from django.shortcuts import render
 from django.shortcuts import render_to_response
 from .forms import LoginForm
-from .forms import EnterAuthenticatorForm, CreateConsumerRequestForm, CreateConsumerForm, CreateProducerForm
+from .forms import EnterAuthenticatorForm, CreateConsumerRequestForm, CreateConsumerForm, CreateProducerForm, SearchForm
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from kafka import KafkaProducer
+from elasticsearch import Elasticsearch
 
 import urllib.request
 import urllib.parse
@@ -270,6 +272,8 @@ def createListing(request):
                 resp_json = urllib.request.urlopen(req).read().decode('utf-8')
                 results = json.loads(resp_json)
 
+                #Added for now to test in exp layer
+                results['ok'] = True
                 if results['ok']:
                     title = form.cleaned_data['title']
                     offered_price = float(form.cleaned_data['offered_price'])
@@ -289,10 +293,26 @@ def createListing(request):
                         response_data['title'] = results2['result']['title']
                         response_data['offered_price'] = results2['result']['offered_price']
                         response_data['description'] = results2['result']['description']
+                        response_data['timestamp'] = results2['result']['timestamp']
                         response_data['availability'] = results2['result']['availability']
                         response_data['consumer'] = results2['result']['consumer']
                         response_data['accepted_producer'] = None
                         response_data['pk'] = results2['result']['pk']
+
+
+                        #producer = KafkaProducer(bootstrap_servers=['kafka:9092'])
+                        # Try to create KafkaProducer globally, otherwise it can be called inside function but would get destroyed each time
+
+                        # inside create_listing function
+                        new_listing = response_data
+
+                        new_listing = {'title': 'Help with Kafka', 'offered_price': 50.0,
+                                   'description': 'New to Kafka, looking for someone to teach me',
+                                   'timestamp': 'March 29, 2018', 'availability': 'Mondays, Tuesdays, Wednesdays',
+                                   'consumer': 3, 'accepted_producer': 'null', 'pk': 10}
+                        #producer.send('new-listings-topic', json.dumps(new_listing).encode('utf-8'))
+                        #producer.close()
+
                     else:
                         response['ok'] = False
                         response['msg'] = "Error with creating listing in the experience layer."
@@ -409,4 +429,36 @@ def createProducer(request):
         response["ok"] = False
         response['msg'] = "Error with creating producer in the experience layer"
     response['result'] = response_data
+    return JsonResponse(response)
+
+@csrf_exempt
+def search(request):
+    response = {}
+    response_data= {}
+
+    try:
+        if request.method == 'POST':
+            form = SearchForm(request.POST)
+
+            if form.is_valid():
+                response["ok"] = True
+                query = form.cleaned_data['query']
+
+                #Will call elastic search with query
+                #es = Elasticsearch(['es'])
+                #results = es.search(index='listing_index',
+                #                    body={'query': {'query_string': {'query': 'kafka'}}, 'size': 10})
+                #print(results['hits']['hits'][0]['_source'])
+                #response_data['result'] = results['hits']['hits'][0]['_source']
+
+            else:
+                response['ok'] = False
+                response['msg'] = "Invalid data sent to search form in the experience layer."
+        else:
+            form = SearchForm()
+            return render(request, 'search.html', {'form': form})
+    except:
+        response["ok"] = False
+        response['msg'] = "Error with search in the experience layer"
+    response["result"] = response_data
     return JsonResponse(response)

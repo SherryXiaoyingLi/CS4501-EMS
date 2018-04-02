@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="en">
+<head>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="{% static 'webapp_web/mystyle.css' %}">
+
+
+    <title>Technology Consultation</title>
+</head>
+
+
+<body>
+    <h1>Technology Consultation</h1>
+    <h2>CS 4501. Elliott Kim, Marissa Lee, Sherry Li</h2>
+
+    {% if logged_in %}
+        <br><a href="/logout">Log out</a><br />
+         Welcome,
+        {% if is_consumer %}
+            <a href="/consumer_detail/{{ user_id }}">{{username}}</a>! <br />
+        {% else %}
+            <a href="/producer_detail/{{ user_id }}">{{username}}</a>! <br />
+        {% endif %}
+    {% else %}
+        <br><a href="/login">Log in</a><br />
+    {% endif %}
+
+    <h3><center><b>Search</b></center></h3>
+
+    {% if form %}
+    <h4>
+
+    <form id="create_listing_form" method="post" class="form-inline" action="">
+
+        {% csrf_token %}
+        {% for hidden in form.hidden_fields %}
+            {{ hidden }}
+        {% endfor %}
+
+        {% for field in form.visible_fields %}
+            {{ field.errors }}
+            {{ field.help_text }}
+            <p>{{ field }}</p>
+        {% endfor %}
+
+
+        <input type="submit" name="submit" value="Submit" />
+
+    </form>
+
+    </h4>
+    {% endif %}
+
+    <h3><center><b>Results</b></center></h3>
+    <h4>
+    {% if results %}
+        {% for result in results %}
+            <a href="/request_detail/{{ result.pk }}">{{result.title}}</a>, <a href="/consumer_detail/{{ result.consumer_pk }}">{{ result.consumer_username }}</a>
+            <i>{{ result.timestamp }}</i> <br />
+            {{ result.description }}
+
+        {% endfor %}
+    {% endif %}
+    </h4>
+    <br><a href="/">Home</a><br />
+    </body>
+</html>
