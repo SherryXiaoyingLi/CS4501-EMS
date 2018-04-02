@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .forms import LoginForm, CreateConsumerRequestForm, CreateConsumerForm, CreateProducerForm
+from .forms import LoginForm, CreateConsumerRequestForm, CreateConsumerForm, CreateProducerForm, SearchForm
 from .forms import EnterAuthenticatorForm
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
@@ -448,4 +448,52 @@ def createProducer(request):
     except:
         response = HttpResponseRedirect(reverse('web_create_producer'))
         messages.error(request, "Error with creating new producer account.")
+        return response
+
+@csrf_exempt
+def searchResults(request):
+    logged_in = True
+    auth = request.COOKIES.get('auth')
+    if not auth:
+        logged_in = False
+    try:
+        if request.method =='POST':
+            form = SearchForm(request.POST)
+
+            if form.is_valid():
+
+                #response['ok'] = True
+
+                query = form.cleaned_data['query']
+
+                post_data = {'query': query}
+                post_encoded = urllib.parse.urlencode(post_data).encode('utf-8')
+
+                # To do: implement django form and post in exp layer
+                #req = urllib.request.Request('http://exp-api:8000/api/v1/search')
+                req = urllib.request.Request('http://exp-api:8000/api/v1/search', data=post_encoded,method='POST')
+                resp_json = urllib.request.urlopen(req).read().decode('utf-8')
+                resp = json.loads(resp_json)
+
+                if resp['ok']:
+                    #pk = resp['result']['pk']
+                    results = [{'title': 'Help with docker', 'description': 'Looking for someone with experience', 'consumer_username': 'mylee3', 'consumer_pk': 1, 'timestamp': 'April 2, 2018', 'pk':1}]
+                    return render(request, 'search_results.html',
+                                  {'form': form, 'logged_in': logged_in, 'query': query, 'results': results})
+                    #messages.success(request, "You successfully created a producer account.")
+
+                else:
+                    response = HttpResponseRedirect(reverse('web_search_results'))
+                    #messages.error(request, resp['msg'])
+                    return response
+            else:
+                response = HttpResponseRedirect(reverse('web_create_producer'))
+                messages.error(request, "Invalid data sent to form in frontend.")
+                return response
+        else:
+            form = SearchForm()
+            return render(request, 'search_results.html', {'form':form, 'logged_in':logged_in, 'query': '', 'results': None})
+    except:
+        response = HttpResponseRedirect(reverse('web_search_results'))
+        messages.error(request, "Error with search.")
         return response

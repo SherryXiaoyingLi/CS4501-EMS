@@ -30,4 +30,5 @@ urlpatterns = [
     url(r'^create_listing$',views.createListing, name='web_create_listing'),
     url(r'^create_consumer$',views.createConsumer, name='web_create_consumer'),
     url(r'^create_producer$',views.createProducer, name='web_create_producer'),
+    url(r'^search_results$',views.searchResults, name='web_search_results'),
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -35,3 +35,6 @@ class CreateProducerForm(forms.Form):
 # Form to delete an authenticator
 class EnterAuthenticatorForm(forms.Form):
     authenticator = forms.CharField(max_length=256, help_text="Authenticator: ")
+
+class SearchForm(forms.Form):
+    query = forms.CharField(max_length=200, help_text="Query: ")

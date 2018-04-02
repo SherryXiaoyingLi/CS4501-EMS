@@ -35,3 +35,6 @@ class CreateProducerForm(forms.Form):
     email = forms.CharField(max_length=200, help_text="Email Address: ")
     bio = forms.CharField(max_length=250, help_text="Bio: ")
     skills = forms.CharField(max_length=200, help_text="Skills: ")
+
+class SearchForm(forms.Form):
+    query = forms.CharField(max_length=200, help_text="Query: ")
