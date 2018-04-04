@@ -456,6 +456,9 @@ def searchResults(request):
     auth = request.COOKIES.get('auth')
     if not auth:
         logged_in = False
+    user_id = request.COOKIES.get('user_id')
+    is_consumer = (request.COOKIES.get('is_consumer') == "True")
+    username = request.COOKIES.get('username')
     try:
         if request.method =='POST':
             form = SearchForm(request.POST)
@@ -477,10 +480,10 @@ def searchResults(request):
 
                 if resp['ok']:
                     #pk = resp['result']['pk']
-                    results = [{'title': 'Help with docker', 'description': 'Looking for someone with experience', 'consumer_username': 'mylee3', 'consumer_pk': 1, 'timestamp': 'April 2, 2018', 'pk':1}]
+                    results = resp['result']
+                    #results = [{'title': 'Help with docker', 'description': 'Looking for someone with experience', 'consumer_username': 'mylee3', 'consumer_pk': 1, 'timestamp': 'April 2, 2018', 'pk':1}]
                     return render(request, 'search_results.html',
-                                  {'form': form, 'logged_in': logged_in, 'query': query, 'results': results})
-                    #messages.success(request, "You successfully created a producer account.")
+                                  {'form': form, 'is_consumer':is_consumer, 'user_id':user_id, 'username': username, 'logged_in': logged_in, 'query': query, 'results': results})
 
                 else:
                     response = HttpResponseRedirect(reverse('web_search_results'))
@@ -492,7 +495,7 @@ def searchResults(request):
                 return response
         else:
             form = SearchForm()
-            return render(request, 'search_results.html', {'form':form, 'logged_in':logged_in, 'query': '', 'results': None})
+            return render(request, 'search_results.html', {'form':form, 'is_consumer':is_consumer, 'user_id':user_id, 'username': username, 'logged_in':logged_in, 'query': '', 'results': None})
     except:
         response = HttpResponseRedirect(reverse('web_search_results'))
         messages.error(request, "Error with search.")
