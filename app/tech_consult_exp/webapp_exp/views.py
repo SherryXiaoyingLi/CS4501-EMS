@@ -273,7 +273,7 @@ def createListing(request):
                 results = json.loads(resp_json)
 
                 #Added for now to test in exp layer
-                results['ok'] = True
+                #results['ok'] = True
                 if results['ok']:
                     title = form.cleaned_data['title']
                     offered_price = float(form.cleaned_data['offered_price'])
@@ -300,18 +300,18 @@ def createListing(request):
                         response_data['pk'] = results2['result']['pk']
 
 
-                        #producer = KafkaProducer(bootstrap_servers=['kafka:9092'])
+                        producer = KafkaProducer(bootstrap_servers=['kafka:9092'])
                         # Try to create KafkaProducer globally, otherwise it can be called inside function but would get destroyed each time
 
                         # inside create_listing function
                         new_listing = response_data
 
-                        new_listing = {'title': 'Help with Kafka', 'offered_price': 50.0,
-                                   'description': 'New to Kafka, looking for someone to teach me',
-                                   'timestamp': 'March 29, 2018', 'availability': 'Mondays, Tuesdays, Wednesdays',
-                                   'consumer': 3, 'accepted_producer': 'null', 'pk': 10}
-                        #producer.send('new-listings-topic', json.dumps(new_listing).encode('utf-8'))
-                        #producer.close()
+                        #new_listing = {'title': 'Help with Kafka', 'offered_price': 50.0,
+                        #           'description': 'New to Kafka, looking for someone to teach me',
+                        #           'timestamp': 'March 29, 2018', 'availability': 'Mondays, Tuesdays, Wednesdays',
+                        #           'consumer': 3, 'accepted_producer': 'null', 'pk': 10}
+                        producer.send('new-listings-topic', json.dumps(new_listing).encode('utf-8'))
+                        producer.close()
 
                     else:
                         response['ok'] = False
@@ -434,7 +434,7 @@ def createProducer(request):
 @csrf_exempt
 def search(request):
     response = {}
-    response_data= {}
+    response_data = []
 
     try:
         if request.method == 'POST':
@@ -445,11 +445,21 @@ def search(request):
                 query = form.cleaned_data['query']
 
                 #Will call elastic search with query
-                #es = Elasticsearch(['es'])
-                #results = es.search(index='listing_index',
-                #                    body={'query': {'query_string': {'query': 'kafka'}}, 'size': 10})
+                es = Elasticsearch(['es'])
+                results = es.search(index='listing_index',
+                                    body={'query': {'query_string': {'query': query}}, 'size': 10})
                 #print(results['hits']['hits'][0]['_source'])
-                #response_data['result'] = results['hits']['hits'][0]['_source']
+                results = results['hits']['hits']
+                for r in results:
+                    data = r['_source']
+                    consumer_pk = data['consumer']
+                    req = urllib.request.Request('http://models-api:8000/api/v1/consumers/' + str(consumer_pk))
+                    resp_json = urllib.request.urlopen(req).read().decode('utf-8')
+                    results = json.loads(resp_json)
+                    consumer_username = results['result']['username']
+                    data['consumer_username'] = consumer_username
+                    #data['consumer_pk'] = consumer_pk
+                    response_data.append(data)
 
             else:
                 response['ok'] = False
