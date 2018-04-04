@@ -95,10 +95,15 @@ All fields need to be entered for CREATE, but not UPDATE
 * 8002/api/v1/requestDetail/1
 * 8002/api/v1/consumerDetail/1
 * 8002/api/v1/producerDetail/1
+* 8002/api/v1/updateListing/1, post_data={consumer, authenticator, title, description, offered_price, availability}
+* 8002/api/v1/updateConsumer/1, post_data={username, password, first_name, last_name, email, phone}
+* 8002/api/v1/updateProducer/1, post_data={username, password, first_name, last_name, email, phone, bio, skills}
 * 8002/api/v1/createListing, post_data={consumer, authenticator, title, description, offered_price, availability}
 * 8002/api/v1/createConsumer, post_data={username, password, first_name, last_name, email, phone}
 * 8002/api/v1/createProducer, post_data={username, password, first_name, last_name, email, phone, bio, skills}
 * 8002/api/v1/search, post_data={query}
+* 8002/api/v1/search_consumer, post_data={query}
+* 8002/api/v1/search_producer, post_data={query}
 
 ## Web
 
@@ -108,7 +113,12 @@ All fields need to be entered for CREATE, but not UPDATE
 * 8000/request_detail/1
 * 8000/consumer_detail/1
 * 8000/producer_detail/1
+* 8000/request_detail/1/update
+* 8000/consumer_detail/1/update
+* 8000/producer_detail/1/update
 * 8000/create_listing
 * 8000/create_consumer
 * 8000/create_producer
 * 8000/search_results
+* 8000/search_consumer_results
+* 8000/search_producer_results
