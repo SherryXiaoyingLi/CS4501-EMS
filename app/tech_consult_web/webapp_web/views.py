@@ -500,3 +500,66 @@ def searchResults(request):
         response = HttpResponseRedirect(reverse('web_search_results'))
         messages.error(request, "Error with search.")
         return response
+
+@csrf_exempt
+def updateListing(request, consumerRequest_pk):
+     # Try to get the authenticator cookie
+     auth = request.COOKIES.get('auth')
+     # If the authenticator cookie wasn't set...
+     if not auth:
+         logged_in = False
+     is_consumer = (request.COOKIES.get('is_consumer')=="True")
+     username = request.COOKIES.get('username')
+
+     user_id = request.COOKIES.get('user_id')
+     return HttpResponse("updateListing")
+
+
+@csrf_exempt
+def updateConsumer(request, consumer_pk):
+    # Try to get the authenticator cookie
+    auth = request.COOKIES.get('auth')
+    # If the authenticator cookie wasn't set...
+    if not auth:
+        logged_in = False
+    is_consumer = (request.COOKIES.get('is_consumer') == "True")
+    username = request.COOKIES.get('username')
+
+    user_id = request.COOKIES.get('user_id')
+    return HttpResponse("updateConsumer")
+
+
+@csrf_exempt
+def updateProducer(request, producer_pk):
+    # Try to get the authenticator cookie
+    auth = request.COOKIES.get('auth')
+    # If the authenticator cookie wasn't set...
+    if not auth:
+        logged_in = False
+    is_consumer = (request.COOKIES.get('is_consumer') == "True")
+    username = request.COOKIES.get('username')
+
+    user_id = request.COOKIES.get('user_id')
+    return HttpResponse("updateProducer")
+
+@csrf_exempt
+def searchConsumerResults(request):
+    logged_in = True
+    auth = request.COOKIES.get('auth')
+    if not auth:
+        logged_in = False
+    user_id = request.COOKIES.get('user_id')
+    is_consumer = (request.COOKIES.get('is_consumer') == "True")
+    username = request.COOKIES.get('username')
+    return HttpResponse("searchConsumerResults")
+
+@csrf_exempt
+def searchProducerResults(request):
+    logged_in = True
+    auth = request.COOKIES.get('auth')
+    if not auth:
+        logged_in = False
+    user_id = request.COOKIES.get('user_id')
+    is_consumer = (request.COOKIES.get('is_consumer') == "True")
+    username = request.COOKIES.get('username')
+    return HttpResponse("searchProducerResults")

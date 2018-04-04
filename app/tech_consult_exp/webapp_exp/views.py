@@ -472,3 +472,43 @@ def search(request):
         response['msg'] = "Error with search in the experience layer"
     response["result"] = response_data
     return JsonResponse(response)
+
+# Update a listing
+def updateListing(request, consumerRequest_pk):
+    response = {}
+    response_data = {}
+
+    response['result'] = response_data
+    return JsonResponse(response)
+
+# Update a consumer
+def updateConsumer(request, consumer_pk):
+    response = {}
+    response_data = {}
+
+    response['result'] = response_data
+    return JsonResponse(response)
+
+# Update a producer
+def updateProducer(request, producer_pk):
+    response = {}
+    response_data = {}
+
+    response['result'] = response_data
+    return JsonResponse(response)
+
+# search for consumers
+def searchConsumer(request):
+    response = {}
+    response_data = {}
+
+    response['result'] = response_data
+    return JsonResponse(response)
+
+# search for producers
+def searchProducer(request):
+    response = {}
+    response_data = {}
+
+    response['result'] = response_data
+    return JsonResponse(response)
