@@ -32,5 +32,10 @@ urlpatterns = [
     url(r'^api/v1/createListing$', views.createListing, name='create_listing'),
     url(r'^api/v1/createConsumer$', views.createConsumer, name='create_consumer'),
     url(r'^api/v1/createProducer$', views.createProducer, name='create_producer'),
+    url(r'^api/v1/updateListing/(?P<consumerRequest_pk>[0-9]+)$', views.updateListing, name='exp_updateListing'),
+    url(r'^api/v1/updateConsumer/(?P<consumer_pk>[0-9]+)$', views.updateConsumer, name='exp_updateConsumer'),
+    url(r'^api/v1/updateProducer/(?P<producer_pk>[0-9]+)$', views.updateProducer, name='exp_updateProducer'),
     url(r'^api/v1/search$', views.search, name='search'),
+    url(r'^api/v1/searchConsumer$', views.searchConsumer, name='search_consumer'),
+    url(r'^api/v1/searchProducer$', views.searchProducer, name='search_producer'),
 ]
