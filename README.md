@@ -102,8 +102,8 @@ All fields need to be entered for CREATE, but not UPDATE
 * 8002/api/v1/createConsumer, post_data={username, password, first_name, last_name, email, phone}
 * 8002/api/v1/createProducer, post_data={username, password, first_name, last_name, email, phone, bio, skills}
 * 8002/api/v1/search, post_data={query}
-* 8002/api/v1/search_consumer, post_data={query}
-* 8002/api/v1/search_producer, post_data={query}
+* 8002/api/v1/searchConsumer, post_data={query}
+* 8002/api/v1/searchProducer, post_data={query}
 
 ## Web
 
