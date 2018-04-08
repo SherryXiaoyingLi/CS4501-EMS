@@ -17,11 +17,16 @@
     {% endif %}
     {% if logged_in %}
         <br><a href="/logout">Log out</a><br />
-        Welcome,
+        Welcome, 
         {% if is_consumer %}
-            <a href="/consumer_detail/{{ user_id }}">{{username}}</a>! <br />
+            <a href="/consumer_detail/{{ user_id }}">{{username}}</a>! <br /> 
+            <a href="/consumer_detail/{{ user_id }}/update">Update</a> your profile here.
+<br />
         {% else %}
             <a href="/producer_detail/{{ user_id }}">{{username}}</a>! <br />
+            <a href="/producer_detail/{{ user_id }}/update">Update</a> your profile here.
+<br />
+
         {% endif %}
     {% else %}
         <br><a href="/login">Log in</a><br />
@@ -37,6 +42,9 @@
     {% else %}
         <h4>{{ msg }}</h4>
     {% endif %}
-<br><a href="/">Home</a><br /></h4>
+<br><a href="/">Home</a><br />
+
+
+</h4>
 </body>
 </html>

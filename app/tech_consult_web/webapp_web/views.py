@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .forms import LoginForm, CreateConsumerRequestForm, CreateConsumerForm, CreateProducerForm, SearchForm
+from .forms import LoginForm, CreateConsumerRequestForm, CreateConsumerForm, CreateProducerForm, SearchForm, SearchConsumerForm, SearchProducerForm, UpdateConsumerForm,UpdateProducerForm
 from .forms import EnterAuthenticatorForm
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
@@ -517,30 +517,188 @@ def updateListing(request, consumerRequest_pk):
 
 @csrf_exempt
 def updateConsumer(request, consumer_pk):
-    # Try to get the authenticator cookie
-    auth = request.COOKIES.get('auth')
-    # If the authenticator cookie wasn't set...
-    if not auth:
-        logged_in = False
-    is_consumer = (request.COOKIES.get('is_consumer') == "True")
-    username = request.COOKIES.get('username')
+        logged_in = True
+        # Try to get the authenticator cookie
+        auth = request.COOKIES.get('auth')
+        # If the authenticator cookie wasn't set...
+        if not auth:
+            logged_in = False
+        is_consumer = (request.COOKIES.get('is_consumer') == "True")
+        username = request.COOKIES.get('username')
+        user_id = request.COOKIES.get('user_id')
 
-    user_id = request.COOKIES.get('user_id')
-    return HttpResponse("updateConsumer")
+        # check if logged in user_id same as producer_pk
+        if user_id == consumer_pk:
+            response = {}
+            response_data = {}
+            try:
+                
+                # User submits the form's data
+                if request.method == 'POST':
+                    form = UpdateConsumerForm(request.POST)
+                                
+                    if form.is_valid():
+                        post_data={}
+                        # Updating the producer based on form input, only for newly inputed fields
+                        if form.cleaned_data['username']:
+                            username = form.cleaned_data['username']
+                            post_data['username'] = username
+                                
+                        if form.cleaned_data['password']:
+                            password = form.cleaned_data['password']
+                            password = make_password(password, salt=None, hasher='default')
+                            post_data['password'] = password
+                                
+                        if form.cleaned_data['first_name']:
+                            first_name = form.cleaned_data['first_name']
+                            post_data['first_name'] = first_name
+                                
+                        if form.cleaned_data['last_name']:
+                            last_name = form.cleaned_data['last_name']
+                            post_data['last_name'] = last_name
+                                
+                        if form.cleaned_data['phone']:
+                            phone = form.cleaned_data['phone']
+                            post_data['phone'] = phone
+                                
+                        if form.cleaned_data['email']:
+                            email = form.cleaned_data['email']
+                            post_data['email'] = email
+                                
+                        #post_data['email'] = "SherryLi@gmail.com"
+                        post_encoded = urllib.parse.urlencode(post_data).encode('utf-8')
+                        req = urllib.request.Request('http://exp-api:8000/api/v1/updateConsumer/'+ str(consumer_pk), data=post_encoded,method='POST')
+                        resp_json = urllib.request.urlopen(req).read().decode('utf-8')
+                        resp = json.loads(resp_json)
+                                                                                                        
+                        if resp['ok']:
+                              #response_data = resp['result']
+                              response = HttpResponseRedirect(reverse('web_consumer_detail', kwargs={'consumer_pk': consumer_pk}))
+                              messages.success(request, "You successfully updated your consumer account.")
+                              return response
+                        else:
+                             response['msg'] = "Fail to update producer profile."
+                                                                                                                            
+                    else:
+                          response['msg'] = "Invalid data sent to form."
+                                                                                                                                    
+                    response['result'] = response_data
+                    return JsonResponse(response)
+                # The form without producer's data filled in
+                else:
+                    form = UpdateConsumerForm()
+                    return render(request, 'update_consumer.html', {'form': form, 'logged_in':logged_in, 'is_consumer':is_consumer, 'user_id':user_id, 'username': username})
+            except Consumer.DoesNotExist:
+                   response['msg'] = "Error with updating producer."
+        else:
+                 response['msg'] = "Unidentified user. Please log in first."
+        response['result'] = response_data
+        return JsonResponse(response)
+
+
 
 
 @csrf_exempt
 def updateProducer(request, producer_pk):
-    # Try to get the authenticator cookie
-    auth = request.COOKIES.get('auth')
-    # If the authenticator cookie wasn't set...
-    if not auth:
-        logged_in = False
-    is_consumer = (request.COOKIES.get('is_consumer') == "True")
-    username = request.COOKIES.get('username')
+ logged_in = True
+ # Try to get the authenticator cookie
+ auth = request.COOKIES.get('auth')
+ # If the authenticator cookie wasn't set...
+ if not auth:
+     logged_in = False
+ is_consumer = (request.COOKIES.get('is_consumer') == "True") # should change to false??
+ username = request.COOKIES.get('username')
+ user_id = request.COOKIES.get('user_id')
 
-    user_id = request.COOKIES.get('user_id')
-    return HttpResponse("updateProducer")
+ # check if logged in user_id same as producer_pk
+ if user_id == producer_pk:
+    response = {}
+    response_data = {}
+    try:
+        #producer = Producer.objects.get(pk=producer_pk)
+        
+        # User submits the form's data
+        if request.method == 'POST':
+            form = UpdateProducerForm(request.POST)
+            
+            if form.is_valid():
+                
+                # Updating the producer based on form input, only for newly inputed fields
+                    post_data={}
+                    if form.cleaned_data['username']:
+                        username = form.cleaned_data['username']
+                        post_data['username'] = username
+                        #response_data['username'] = username
+                    if form.cleaned_data['password']:
+                        password = form.cleaned_data['password']
+                        password = make_password(password, salt=None, hasher='default')
+                        post_data['password'] = password
+                        #response_data['password'] = password
+                    if form.cleaned_data['first_name']:
+                        first_name = form.cleaned_data['first_name']
+                        post_data['first_name'] = first_name
+                        #response_data['first_name'] = first_name
+                    if form.cleaned_data['last_name']:
+                        last_name = form.cleaned_data['last_name']
+                        post_data['last_name'] = last_name
+                        #response_data['last_name'] = last_name
+                    if form.cleaned_data['phone']:
+                        phone = form.cleaned_data['phone']
+                        post_data['phone'] = phone
+                        #response_data['phone'] = phone
+                    if form.cleaned_data['email']:
+                        email = form.cleaned_data['email']
+                        post_data['email'] = email
+                        #response_data['email'] = email
+                    if form.cleaned_data['bio']:
+                        bio = form.cleaned_data['bio']
+                        post_data['bio'] = bio
+                        #response_data['bio'] = bio
+                    if form.cleaned_data['skills']:
+                        skills = form.cleaned_data['skills']
+                        post_data['skills'] = skills
+                        #response_data['skills'] = skills
+                
+                    #post_data['pk'] = producer_pk
+                    post_encoded = urllib.parse.urlencode(post_data).encode('utf-8')
+                
+                    # To do: implement django form and post in exp layer
+                    req = urllib.request.Request('http://exp-api:8000/api/v1/updateProducer/'+ str(producer_pk), data=post_encoded,method='POST')
+                    resp_json = urllib.request.urlopen(req).read().decode('utf-8')
+                    resp = json.loads(resp_json)
+
+                    if resp['ok']:
+                        response = HttpResponseRedirect(reverse('web_producer_detail', kwargs={'producer_pk': producer_pk}))
+                        messages.success(request, "You successfully updated your producer account.")
+                        return response
+                    else:
+                        response['msg'] = "Fail to update producer profile."
+    
+            else:
+                #response['ok'] = False
+                response['msg'] = "Invalid data sent to form."
+            
+            response['result'] = response_data
+            return JsonResponse(response)
+        
+        # The form without producer's data filled in
+        else:
+            form = UpdateProducerForm() # need create another form?
+            return render(request, 'update_producer.html', {'form': form, 'update': True, 'logged_in':logged_in, 'is_consumer':is_consumer, 'user_id':user_id, 'username': username})
+
+    except:
+        #response['ok'] = False
+        response['msg'] = "Error with updating producer."
+
+ else:
+    response['msg'] = "Unidentified user. Please log in first."
+    
+ response['result'] = response_data
+ return JsonResponse(response)
+
+
+
+
 
 @csrf_exempt
 def searchConsumerResults(request):
@@ -551,7 +709,50 @@ def searchConsumerResults(request):
     user_id = request.COOKIES.get('user_id')
     is_consumer = (request.COOKIES.get('is_consumer') == "True")
     username = request.COOKIES.get('username')
-    return HttpResponse("searchConsumerResults")
+    try:
+      if request.method =='POST':
+            form = SearchConsumerForm(request.POST)
+
+            if form.is_valid():
+                
+                #response['ok'] = True
+                
+                query = form.cleaned_data['query']
+                
+                post_data = {'query': query}
+                post_encoded = urllib.parse.urlencode(post_data).encode('utf-8')
+                
+                # To do: implement django form and post in exp layer
+                req = urllib.request.Request('http://exp-api:8000/api/v1/searchConsumer')
+                req = urllib.request.Request('http://exp-api:8000/api/v1/searchConsumer', data=post_encoded,method='POST')
+                resp_json = urllib.request.urlopen(req).read().decode('utf-8')
+                resp = json.loads(resp_json)
+                
+                resp['ok'] = True
+                
+                if resp['ok']:
+                    #pk = resp['result']['pk']
+                    results = resp['result']
+                    results = [{'username': 'Xiaoying', 'password': '123@', 'first_name': 'Xiaoying', 'last_name':'Li', 'phone':'434222','email':'xxx','pk':1}]
+                    return render(request, 'searchConsumer_results.html',
+                                  {'form': form, 'is_consumer':is_consumer, 'user_id':user_id, 'username': username, 'logged_in': logged_in, 'query': query, 'results': results})
+                
+                else:
+                    response = HttpResponseRedirect(reverse('web_search_consumer_results'))
+                    #messages.error(request, resp['msg'])
+                    return response
+            else:
+                response = HttpResponseRedirect(reverse('web_create_producer')) #??
+                messages.error(request, "Invalid data sent to form in frontend.")
+                return response
+      else:
+            form = SearchForm()
+            return render(request, 'searchConsumer_results.html', {'form':form, 'is_consumer':is_consumer, 'user_id':user_id, 'username': username, 'logged_in':logged_in, 'query': '', 'results': None})
+    except Consumer.DoesNotExist:
+        response = HttpResponseRedirect(reverse('web_search_consumer_results'))
+        messages.error(request, "Error with search.")
+        return response
+
 
 @csrf_exempt
 def searchProducerResults(request):
@@ -562,4 +763,44 @@ def searchProducerResults(request):
     user_id = request.COOKIES.get('user_id')
     is_consumer = (request.COOKIES.get('is_consumer') == "True")
     username = request.COOKIES.get('username')
-    return HttpResponse("searchProducerResults")
+    try:
+        if request.method =='POST':
+            form = SearchProducerForm(request.POST)
+            
+            if form.is_valid():
+                
+                #response['ok'] = True
+                
+                query = form.cleaned_data['query']
+                
+                post_data = {'query': query}
+                post_encoded = urllib.parse.urlencode(post_data).encode('utf-8')
+                
+                # To do: implement django form and post in exp layer
+                #req = urllib.request.Request('http://exp-api:8000/api/v1/search')
+                req = urllib.request.Request('http://exp-api:8000/api/v1/searchProducer', data=post_encoded,method='POST')
+                resp_json = urllib.request.urlopen(req).read().decode('utf-8')
+                resp = json.loads(resp_json)
+                
+                if resp['ok']:
+                    #pk = resp['result']['pk']
+                    results = resp['result']
+                    #results = [{'title': 'Help with docker', 'description': 'Looking for someone with experience', 'consumer_username': 'mylee3', 'consumer_pk': 1, 'timestamp': 'April 2, 2018', 'pk':1}]
+                    return render(request, 'searchProducer_results.html',
+                                  {'form': form, 'is_consumer':is_consumer, 'user_id':user_id, 'username': username, 'logged_in': logged_in, 'query': query, 'results': results}) # html return correct info for result?
+                
+                else:
+                    response = HttpResponseRedirect(reverse('web_search_producer_results'))
+                    #messages.error(request, resp['msg'])
+                    return response
+            else:
+                response = HttpResponseRedirect(reverse('web_create_producer')) #??
+                messages.error(request, "Invalid data sent to form in frontend.")
+                return response
+        else:
+            form = SearchForm()
+            return render(request, 'searchProducer_results.html', {'form':form, 'is_consumer':is_consumer, 'user_id':user_id, 'username': username, 'logged_in':logged_in, 'query': '', 'results': None})
+    except:
+        response = HttpResponseRedirect(reverse('web_search_producer_results'))
+        messages.error(request, "Error with search.")
+        return response

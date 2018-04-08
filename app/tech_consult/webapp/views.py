@@ -134,9 +134,9 @@ def update_consumer (request, consumer_pk):
 
                 # Checking if username exists
                 try:
-                    c = Consumer.objects.get(username=form.cleaned_data['username'])
-                    response['ok'] = False
-                    response['msg'] = "Consumer with username " + form.cleaned_data['username'] + " exists."
+                   c = Consumer.objects.get(username=form.cleaned_data['username'])
+                   response['ok'] = False
+                   response['msg'] = "Consumer with username " + form.cleaned_data['username'] + " exists."
                 except:
                     response['ok'] = True
 
@@ -175,7 +175,7 @@ def update_consumer (request, consumer_pk):
 
         # The form filled with the consumer's data
         else:
-            form = UpdateConsumerForm(initial={'username':consumer.username, 'first_name': consumer.first_name, 'last_name': consumer.last_name, 'phone': consumer.phone, 'email': consumer.email})
+            form = UpdateConsumerForm()
             return render(request, 'update_consumer.html', {'form': form, 'update': True})
 
     except:
