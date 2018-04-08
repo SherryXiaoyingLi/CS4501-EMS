@@ -52,4 +52,4 @@ batch:
       - es:es
    volumes:
       - ./batch:/app
-   command: bash -c "python search_indexer.py"
+   command: bash -c "python search_indexer.py && python search_consumer_indexer.py && python search_producer_indexer.py"

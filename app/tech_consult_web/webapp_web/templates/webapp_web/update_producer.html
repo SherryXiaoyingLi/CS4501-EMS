@@ -2,22 +2,18 @@
 {% load staticfiles %}
 <html lang="en">
 <head>
-
+    <meta charset="UTF-8">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
     <link rel="stylesheet" type="text/css" href="{% static 'webapp_web/mystyle.css' %}">
-    <title>Technology Consult</title>
+
+
+    <title>Technology Consulting</title>
 </head>
 <body>
-    <h1>Technology Consultation</h1>
-    <h2>CS 4501. Elliott Kim, Marissa Lee, Sherry Li</h2>
-    {% if messages %}
-      {% for message in messages %}
-        {{ message }}
-      {% endfor %}
-    {% endif %}
-    {% if logged_in %}
+   
+   {% if logged_in %}
         <br><a href="/logout">Log out</a><br />
-       Welcome,
+         Welcome,
         {% if is_consumer %}
             <a href="/consumer_detail/{{ user_id }}">{{username}}</a>! <br />
             <a href="/consumer_detail/{{ user_id }}/update">Update</a> your profile here.
@@ -32,19 +28,33 @@
     {% else %}
         <br><a href="/login">Log in</a><br />
     {% endif %}
-     <h3><center><b>Producer Details</b></center></h3>
-    {% if ok %}
-        <h4>
-            <p>Username: {{producer_username}}</p>
-            <p>Full Name: {{full_name}} </p>
-            <p>Email: {{email}}</p>
-            <p>Phone: {{phone}} </p>
-            <p>Biography: {{bio}} </p>
-            <p>Skills: {{skills}} </p>
-        </h4>
+
+    <h3><center><b>Update</b></center></h3>
+
+    {% if update %}
+        <h1>Update Producer</h1>
     {% else %}
-        <h4>{{ msg }}</h4>
+        <h1>Create Producer</h1>
     {% endif %}
-<br><a href="/">Home</a><br /></h4>
+    <h4>
+    <form id="update_producer_form" method="post" class="form-inline" action="">
+
+                {% csrf_token %}
+                {% for hidden in form.hidden_fields %}
+                    {{ hidden }}
+                {% endfor %}
+
+                {% for field in form.visible_fields %}
+                    {{ field.errors }}
+                    {{ field.help_text }}
+                    <p>{{ field }}</p>
+                {% endfor %}
+
+                <input type="submit" name="submit" value="Submit" />
+
+                <br><a href="/">Home</a><br />
+            </form>
+      </h4>
+
 </body>
 </html>

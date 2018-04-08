@@ -32,9 +32,42 @@ class CreateProducerForm(forms.Form):
     bio = forms.CharField(max_length=250, help_text="Bio: ")
     skills = forms.CharField(max_length=200, help_text="Skills: ")
 
+class UpdateConsumerForm(forms.Form):
+    username = forms.CharField(max_length=200, help_text="Username: ", required=False)
+    password = forms.CharField(max_length=200, help_text="Password: ", required=False)
+    first_name = forms.CharField(max_length=200, help_text="First Name: ", required=False)
+    last_name = forms.CharField(max_length=200, help_text="Last Name: ", required=False)
+    phone = forms.CharField(max_length=15, help_text="Phone Number: ", required=False)
+    email = forms.CharField(max_length=200, help_text="Email Address: ", required=False)
+    
+    #class Meta:
+        # Provide an association between the ModelForm and a model
+        #   model = Consumer
+        #fields = ('username', 'password', 'first_name', 'last_name', 'phone', 'email')
+
+class UpdateProducerForm(forms.Form):
+    username = forms.CharField(max_length=200, help_text="Username: ", required=False)
+    password = forms.CharField(max_length=200, help_text="Password: ", required=False)
+    first_name = forms.CharField(max_length=200, help_text="First Name: ", required=False)
+    last_name = forms.CharField(max_length=200, help_text="Last Name: ", required=False)
+    phone = forms.CharField(max_length=15, help_text="Phone Number: ", required=False)
+    email = forms.CharField(max_length=200, help_text="Email Address: ", required=False)
+    bio = forms.CharField(max_length=250, help_text="Bio: ", required=False)
+    skills = forms.CharField(max_length=200, help_text="Skills: ", required=False)
+
 # Form to delete an authenticator
 class EnterAuthenticatorForm(forms.Form):
     authenticator = forms.CharField(max_length=256, help_text="Authenticator: ")
 
 class SearchForm(forms.Form):
     query = forms.CharField(max_length=200, help_text="Query: ")
+
+class SearchConsumerForm(forms.Form):
+    query = forms.CharField(max_length=200, help_text="Query: ")
+
+class SearchProducerForm(forms.Form):
+    query = forms.CharField(max_length=200, help_text="Query: ")
+
+
+
+

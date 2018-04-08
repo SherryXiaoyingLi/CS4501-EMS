@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.shortcuts import render_to_response
 from .forms import LoginForm
-from .forms import EnterAuthenticatorForm, CreateConsumerRequestForm, CreateConsumerForm, CreateProducerForm, SearchForm
+from .forms import EnterAuthenticatorForm, CreateConsumerRequestForm, CreateConsumerForm, CreateProducerForm, SearchForm, SearchConsumerForm, SearchProducerForm, UpdateConsumerForm, UpdateProducerForm
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -355,6 +355,9 @@ def createConsumer(request):
                 resp_json = urllib.request.urlopen(req).read().decode('utf-8')
                 results = json.loads(resp_json)
 
+                #Added for now to test in exp layer
+                #results['ok'] = True
+                
                 if results['ok']:
                     response['ok'] = True
                     response_data['username'] = results['result']['username']
@@ -364,6 +367,16 @@ def createConsumer(request):
                     response_data['phone'] = results['result']['phone']
                     response_data['email'] = results['result']['email']
                     response_data['pk'] = results['result']['pk']
+                
+                    producer = KafkaProducer(bootstrap_servers=['kafka:9092'])
+                    # Try to create KafkaProducer globally, otherwise it can be called inside function but would get destroyed each time
+                
+                    # inside create_consumer function
+                    new_consumer = response_data
+                    #new_consumer = {'username':'XYL','passowrd':'abc950312','first_name':'Xiaoying','last_name':'Li','phone':'434122','email':'kqqq@126.com','pk'=3}
+                    producer.send('new-consumer-topic',json.dumps(new_consumer).encode('utf-8'))
+                    producer.close()
+                
                 else:
                     response['ok'] = False
                     response['msg'] = results['msg']
@@ -404,6 +417,9 @@ def createProducer(request):
                 req = urllib.request.Request('http://models-api:8000/api/v1/producers/create', data=post_encoded, method='POST') #data???
                 resp_json = urllib.request.urlopen(req).read().decode('utf-8')
                 results = json.loads(resp_json)
+                
+                #Added for now to test in exp layer
+                #results['ok'] = True
 
                 if results['ok']:
                     response['ok'] = True
@@ -416,6 +432,15 @@ def createProducer(request):
                     response_data['bio'] = results['result']['bio']
                     response_data['skills'] = results['result']['skills']
                     response_data['pk'] = results['result']['pk']
+                
+                    producer = KafkaProducer(bootstrap_servers=['kafka:9092'])
+                    # Try to create KafkaProducer globally, otherwise it can be called inside function but would get destroyed each time
+                    
+                    # inside create_consumer function
+                    new_producer = response_data
+                    #new_producer = {'username':'Xxx','passowrd':'abc950312','first_name':'Xiaoying','last_name':'Li','phone':'4341221','email':'kqqq@12611.com','pk'=4}
+                    producer.send('new-producer-topic',json.dumps(new_producer).encode('utf-8'))
+                    producer.close()
                 else:
                     response['ok'] = False
                     response['msg'] = results['msg']
@@ -482,33 +507,214 @@ def updateListing(request, consumerRequest_pk):
     return JsonResponse(response)
 
 # Update a consumer
+@csrf_exempt
 def updateConsumer(request, consumer_pk):
     response = {}
     response_data = {}
-
+    try:
+        # User submits the form's data
+        if request.method == 'POST':
+            form = UpdateConsumerForm(request.POST)
+            
+            if form.is_valid():
+                response["ok"] = True
+                post_data = {}
+                if form.cleaned_data['username']:
+                    username = form.cleaned_data['username']
+                    post_data['username'] = username
+                if form.cleaned_data['password']:
+                    password = form.cleaned_data['password']
+                    password = make_password(password, salt=None, hasher='default')
+                    post_data['password'] = password
+                if form.cleaned_data['first_name']:
+                    first_name = form.cleaned_data['first_name']
+                    post_data['first_name'] = first_name
+                if form.cleaned_data['last_name']:
+                    last_name = form.cleaned_data['last_name']
+                    post_data['last_name'] = last_name
+                if form.cleaned_data['phone']:
+                    phone = form.cleaned_data['phone']
+                    post_data['phone'] = phone
+                if form.cleaned_data['email']:
+                    email = form.cleaned_data['email']
+                    post_data['email'] = email
+                
+                #post_data['pk'] = producer_pk
+                #post_data = {'password':password, 'first_name': first_name, 'last_name':last_name, 'phone':phone, 'email':email}
+                #post_data = {'email':'a@gmail.com'}
+                post_encoded = urllib.parse.urlencode(post_data).encode('utf-8')
+                                                                
+                req = urllib.request.Request('http://models-api:8000/api/v1/consumers/'+ str(consumer_pk)+'/update', data=post_encoded,method='POST')
+                resp_json = urllib.request.urlopen(req).read().decode('utf-8')
+                resp = json.loads(resp_json)
+                                                                
+                if resp['ok']:
+                    response_data = resp['result']
+                else:
+                    response['ok'] = False
+                    response['msg'] = "Fail to update consumer profile in experience layer."
+            else:
+                response['ok'] = False
+                response['msg'] = "Invalid data sent to form."
+    
+        else:
+            form = UpdateConsumerForm()
+            return render(request, 'update_consumer.html', {'form': form})
+    except Consumer.DoesNotExist:
+        response['ok'] = False
+        response['msg'] = "Error with updating producer."
+                                                                                    
     response['result'] = response_data
     return JsonResponse(response)
 
+
 # Update a producer
+@csrf_exempt
 def updateProducer(request, producer_pk):
     response = {}
     response_data = {}
+    try:
+        # User submits the form's data
+        if request.method == 'POST':
+            form = UpdateProducerForm(request.POST)
+
+            if form.is_valid():
+                  response["ok"] = True
+                  post_data={}
+                  if form.cleaned_data['username']:
+                    username = form.cleaned_data['username']
+                    post_data['username'] = username
+                  if form.cleaned_data['password']:
+                    password = form.cleaned_data['password']
+                    password = make_password(password, salt=None, hasher='default')
+                    post_data['password'] = password
+                  if form.cleaned_data['first_name']:
+                     first_name = form.cleaned_data['first_name']
+                     post_data['first_name'] = first_name
+                  if form.cleaned_data['last_name']:
+                     last_name = form.cleaned_data['last_name']
+                     post_data['last_name'] = last_name
+                  if form.cleaned_data['phone']:
+                     phone = form.cleaned_data['phone']
+                     post_data['phone'] = phone
+                  if form.cleaned_data['email']:
+                     email = form.cleaned_data['email']
+                     post_data['email'] = email
+                  if form.cleaned_data['bio']:
+                     bio = form.cleaned_data['bio']
+                     post_data['bio'] = bio
+                  if form.cleaned_data['skills']:
+                     skills = form.cleaned_data['skills']
+                     post_data['skills'] = skills
+                                                                                                            
+                  #post_data['pk'] = producer_pk
+                  post_encoded = urllib.parse.urlencode(post_data).encode('utf-8')
+                                                                                                        
+                  req = urllib.request.Request('http://models-api:8000/api/v1/producers/'+ str(producer_pk)+'/update', data=post_encoded,method='POST')
+                  resp_json = urllib.request.urlopen(req).read().decode('utf-8')
+                  resp = json.loads(resp_json)
+
+                  if resp['ok']:
+                      response_data = resp['result']
+                  else:
+                      response['ok'] = False
+                      response['msg'] = "Fail to update producer profile in experience layer."
+            else:
+                response['ok'] = False
+                response['msg'] = "Invalid data sent to form."
+                                                                                                                                        
+            response['result'] = response_data
+            return JsonResponse(response)
+                                                                                                                                            
+        else:
+            form = UpdateProducerForm()
+            return render(request, 'update_producer.html', {'form': form, 'update': True})
+    except:
+        response['ok'] = False
+        response['msg'] = "Error with updating producer."
 
     response['result'] = response_data
     return JsonResponse(response)
 
+
 # search for consumers
+@csrf_exempt
 def searchConsumer(request):
     response = {}
-    response_data = {}
-
-    response['result'] = response_data
+    response_data = []
+    
+    try:
+        if request.method == 'POST':
+            form = SearchConsumerForm(request.POST)
+            
+            if form.is_valid():
+                response["ok"] = True
+                query = form.cleaned_data['query']
+                
+                #Will call elastic search with query
+                es = Elasticsearch(['es'])
+                results = es.search(index='consumer_index', body={'query': {'query_string': {'query': 'XiaoyingLi'}}, 'size': 10})
+                results = results['hits']['hits']
+                for r in results:
+                        data = r['_source']
+                        consumer_pk = data['consumer']
+                        # need this step?? what's being passed back from kafka search
+                        req = urllib.request.Request('http://models-api:8000/api/v1/consumers/' + str(consumer_pk))
+                        resp_json = urllib.request.urlopen(req).read().decode('utf-8')
+                        results = json.loads(resp_json)
+                        consumer_username = results['result']['username']
+                        data['consumer_username'] = consumer_username
+                        response_data.append(data)
+        
+            else:
+                response['ok'] = False
+                response['msg'] = "Invalid data sent to search form in the experience layer."
+        else:
+                form = SearchConsumerForm()
+                return render(request, 'searchConsumer.html', {'form': form})
+    except Consumer.DoesNotExist:
+        response["ok"] = False
+        response['msg'] = "Error with search in the experience layer"
+    response["result"] = response_data
     return JsonResponse(response)
 
 # search for producers
+@csrf_exempt
 def searchProducer(request):
     response = {}
-    response_data = {}
-
-    response['result'] = response_data
+    response_data = []
+    
+    try:
+        if request.method == 'POST':
+            form = SearchProducerForm(request.POST)
+            
+            if form.is_valid():
+                response["ok"] = True
+                query = form.cleaned_data['query']
+                
+                #Will call elastic search with query
+                es = Elasticsearch(['es'])
+                results = es.search(index='producer_index',
+                                    body={'query': {'query_string': {'query': query}}, 'size': 10})
+                results = results['hits']['hits']
+                for r in results:
+                    data = r['_source']
+                    producer_pk = data['producer']
+                    req = urllib.request.Request('http://models-api:8000/api/v1/producers/' + str(producer_pk))
+                    resp_json = urllib.request.urlopen(req).read().decode('utf-8')
+                    results = json.loads(resp_json)
+                    producer_username = results['result']['username']
+                    data['producer_username'] = producer_username
+                    response_data.append(data)
+            
+            else:
+                response['ok'] = False
+                response['msg'] = "Invalid data sent to search form in the experience layer."
+        else:
+                    form = SearchProducerForm()
+                    return render(request, 'searchProducer.html', {'form': form})
+    except:
+        response["ok"] = False
+        response['msg'] = "Error with search in the experience layer"
+    response["result"] = response_data
     return JsonResponse(response)
