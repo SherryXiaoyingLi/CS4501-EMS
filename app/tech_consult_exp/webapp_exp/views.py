@@ -303,14 +303,15 @@ def createListing(request):
                         producer = KafkaProducer(bootstrap_servers=['kafka:9092'])
                         # Try to create KafkaProducer globally, otherwise it can be called inside function but would get destroyed each time
 
+                        response_data['type']="listing"
                         # inside create_listing function
                         new_listing = response_data
-
                         #new_listing = {'title': 'Help with Kafka', 'offered_price': 50.0,
                         #           'description': 'New to Kafka, looking for someone to teach me',
                         #           'timestamp': 'March 29, 2018', 'availability': 'Mondays, Tuesdays, Wednesdays',
                         #           'consumer': 3, 'accepted_producer': 'null', 'pk': 10}
-                        producer.send('new-listings-topic', json.dumps(new_listing).encode('utf-8'))
+
+                        producer.send('kafka_topic', json.dumps(new_listing).encode('utf-8'))
                         producer.close()
 
                     else:
@@ -372,9 +373,10 @@ def createConsumer(request):
                     # Try to create KafkaProducer globally, otherwise it can be called inside function but would get destroyed each time
                 
                     # inside create_consumer function
+                    response_data['type']="consumer"
                     new_consumer = response_data
                     #new_consumer = {'username':'XYL','passowrd':'abc950312','first_name':'Xiaoying','last_name':'Li','phone':'434122','email':'kqqq@126.com','pk'=3}
-                    producer.send('new-consumer-topic',json.dumps(new_consumer).encode('utf-8'))
+                    producer.send('kafka_topic',json.dumps(new_consumer).encode('utf-8'))
                     producer.close()
                 
                 else:
@@ -437,9 +439,10 @@ def createProducer(request):
                     # Try to create KafkaProducer globally, otherwise it can be called inside function but would get destroyed each time
                     
                     # inside create_consumer function
+                    response_data['type']="producer"
                     new_producer = response_data
                     #new_producer = {'username':'Xxx','passowrd':'abc950312','first_name':'Xiaoying','last_name':'Li','phone':'4341221','email':'kqqq@12611.com','pk'=4}
-                    producer.send('new-producer-topic',json.dumps(new_producer).encode('utf-8'))
+                    producer.send('kafka_topic',json.dumps(new_producer).encode('utf-8'))
                     producer.close()
                 else:
                     response['ok'] = False
@@ -640,43 +643,38 @@ def updateProducer(request, producer_pk):
 # search for consumers
 @csrf_exempt
 def searchConsumer(request):
-    response = {}
-    response_data = []
-    
-    try:
-        if request.method == 'POST':
-            form = SearchConsumerForm(request.POST)
-            
-            if form.is_valid():
-                response["ok"] = True
-                query = form.cleaned_data['query']
-                
-                #Will call elastic search with query
-                es = Elasticsearch(['es'])
-                results = es.search(index='consumer_index', body={'query': {'query_string': {'query': 'XiaoyingLi'}}, 'size': 10})
-                results = results['hits']['hits']
-                for r in results:
-                        data = r['_source']
-                        consumer_pk = data['consumer']
-                        # need this step?? what's being passed back from kafka search
-                        req = urllib.request.Request('http://models-api:8000/api/v1/consumers/' + str(consumer_pk))
-                        resp_json = urllib.request.urlopen(req).read().decode('utf-8')
-                        results = json.loads(resp_json)
-                        consumer_username = results['result']['username']
-                        data['consumer_username'] = consumer_username
-                        response_data.append(data)
+ response = {}
+ response_data = []
+ try:
+    if request.method == 'POST':
+        form = SearchConsumerForm(request.POST)
         
-            else:
-                response['ok'] = False
-                response['msg'] = "Invalid data sent to search form in the experience layer."
+        if form.is_valid():
+            response["ok"] = True
+            query = form.cleaned_data['query']
+            
+            #Will call elastic search with query
+            es = Elasticsearch(['es'])
+            results = es.search(index='consumer_index', body={'query': {'query_string': {'query': query}}, 'size': 10})
+            results = results['hits']['hits']
+            
+            for r in results:
+                data = r['_source']
+                response_data.append(data)
+
+            #response_data=results
+    
         else:
-                form = SearchConsumerForm()
-                return render(request, 'searchConsumer.html', {'form': form})
-    except Consumer.DoesNotExist:
-        response["ok"] = False
-        response['msg'] = "Error with search in the experience layer"
-    response["result"] = response_data
-    return JsonResponse(response)
+            response['ok'] = False
+            response['msg'] = "Invalid data sent to search form in the experience layer."
+    else:
+            form = SearchConsumerForm()
+            return render(request, 'searchConsumer.html', {'form': form})
+ except:
+    response["ok"] = False
+    response['msg'] = "Error with search in the experience layer"
+ response["result"] = response_data
+ return JsonResponse(response)
 
 # search for producers
 @csrf_exempt
@@ -692,20 +690,13 @@ def searchProducer(request):
                 response["ok"] = True
                 query = form.cleaned_data['query']
                 
-                #Will call elastic search with query
                 es = Elasticsearch(['es'])
-                results = es.search(index='producer_index',
-                                    body={'query': {'query_string': {'query': query}}, 'size': 10})
+                results = es.search(index='producer_index', body={'query': {'query_string': {'query': query}}, 'size': 10})
                 results = results['hits']['hits']
                 for r in results:
                     data = r['_source']
-                    producer_pk = data['producer']
-                    req = urllib.request.Request('http://models-api:8000/api/v1/producers/' + str(producer_pk))
-                    resp_json = urllib.request.urlopen(req).read().decode('utf-8')
-                    results = json.loads(resp_json)
-                    producer_username = results['result']['username']
-                    data['producer_username'] = producer_username
                     response_data.append(data)
+
             
             else:
                 response['ok'] = False

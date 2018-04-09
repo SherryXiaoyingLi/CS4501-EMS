@@ -715,34 +715,29 @@ def searchConsumerResults(request):
 
             if form.is_valid():
                 
-                #response['ok'] = True
-                
                 query = form.cleaned_data['query']
                 
                 post_data = {'query': query}
                 post_encoded = urllib.parse.urlencode(post_data).encode('utf-8')
                 
                 # To do: implement django form and post in exp layer
-                req = urllib.request.Request('http://exp-api:8000/api/v1/searchConsumer')
+                #req = urllib.request.Request('http://exp-api:8000/api/v1/searchConsumer')
                 req = urllib.request.Request('http://exp-api:8000/api/v1/searchConsumer', data=post_encoded,method='POST')
                 resp_json = urllib.request.urlopen(req).read().decode('utf-8')
                 resp = json.loads(resp_json)
                 
-                resp['ok'] = True
                 
                 if resp['ok']:
-                    #pk = resp['result']['pk']
                     results = resp['result']
-                    results = [{'username': 'Xiaoying', 'password': '123@', 'first_name': 'Xiaoying', 'last_name':'Li', 'phone':'434222','email':'xxx','pk':1}]
-                    return render(request, 'searchConsumer_results.html',
-                                  {'form': form, 'is_consumer':is_consumer, 'user_id':user_id, 'username': username, 'logged_in': logged_in, 'query': query, 'results': results})
+                    #results = [{'username': 'Xiaoying', 'password': '123@', 'first_name': 'Xiaoying', 'last_name':'Li', 'phone':'434222','email':'xxx','pk':1}]
+                    return render(request, 'searchConsumer_results.html', {'form': form, 'is_consumer':is_consumer, 'user_id':user_id, 'username': username, 'logged_in': logged_in, 'query': query, 'results': results})
                 
                 else:
                     response = HttpResponseRedirect(reverse('web_search_consumer_results'))
                     #messages.error(request, resp['msg'])
                     return response
             else:
-                response = HttpResponseRedirect(reverse('web_create_producer')) #??
+                response = HttpResponseRedirect(reverse('web_create_producer'))
                 messages.error(request, "Invalid data sent to form in frontend.")
                 return response
       else:
@@ -787,7 +782,7 @@ def searchProducerResults(request):
                     results = resp['result']
                     #results = [{'title': 'Help with docker', 'description': 'Looking for someone with experience', 'consumer_username': 'mylee3', 'consumer_pk': 1, 'timestamp': 'April 2, 2018', 'pk':1}]
                     return render(request, 'searchProducer_results.html',
-                                  {'form': form, 'is_consumer':is_consumer, 'user_id':user_id, 'username': username, 'logged_in': logged_in, 'query': query, 'results': results}) # html return correct info for result?
+                                  {'form': form, 'is_consumer':is_consumer, 'user_id':user_id, 'username': username, 'logged_in': logged_in, 'query': query, 'results': results})
                 
                 else:
                     response = HttpResponseRedirect(reverse('web_search_producer_results'))

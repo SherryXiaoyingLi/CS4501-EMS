@@ -57,11 +57,8 @@
     <h4>
     {% if results %}
         {% for result in results %}
-            <a href="/request_detail/{{ result.pk }}">{{result.title}}</a>, <a href="/producer_detail/{{ result.producer }}">{{ result.producer_username }}</a>
-            <i>{{ result.timestamp }}</i> <br />
-            {{ result.description }}
-            <br />
-            <br />
+            <a href="/producer_detail/{{ result.pk }}">{{ result.username }}</a>
+           <br />
         {% endfor %}
     {% endif %}
     </h4>
