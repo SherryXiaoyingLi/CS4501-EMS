@@ -30,13 +30,9 @@
     {% endif %}
 
     <h3><center><b>Update</b></center></h3>
-
-    {% if update %}
-        <h1>Update Producer</h1>
-    {% else %}
-        <h1>Create Producer</h1>
-    {% endif %}
+    <p>Please only enter the fields to update</p>
     <h4>
+    
     <form id="update_producer_form" method="post" class="form-inline" action="">
 
                 {% csrf_token %}

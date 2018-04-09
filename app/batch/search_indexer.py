@@ -3,7 +3,7 @@ from elasticsearch import Elasticsearch
 import json
 import time
 
-time.sleep(5)
+time.sleep(15)
 
 consumer = KafkaConsumer('kafka_topic', group_id='indexer', bootstrap_servers=['kafka:9092'])
 
