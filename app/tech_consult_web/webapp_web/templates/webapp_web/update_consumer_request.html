@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    
+
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
     <link rel="stylesheet" type="text/css" href="{% static 'webapp_web/mystyle.css' %}">
 
@@ -23,10 +23,10 @@
         <br><a href="/login">Log in</a><br />
     {% endif %}
 
-    <h3><center><b>Update</b></center></h3>
-     <p>Please only enter the fields to update</p>
+    <h3><center><b>Update Listing</b></center></h3>
+    <p>Please only enter the fields to update</p>
      <h4>
-    <form id="create_consumer_form" method="post" class="form-inline" action="">
+    <form id="create_consumer__request_form" method="post" class="form-inline" action="">
 
                 {% csrf_token %}
                 {% for hidden in form.hidden_fields %}
