@@ -32,6 +32,12 @@ class CreateProducerForm(forms.Form):
     bio = forms.CharField(max_length=250, help_text="Bio: ")
     skills = forms.CharField(max_length=200, help_text="Skills: ")
 
+class UpdateConsumerRequestForm(forms.Form):
+    title = forms.CharField(max_length=200, help_text="Title: ", required=False)
+    offered_price = forms.FloatField(help_text="Offered Price: ", required=False)
+    description = forms.CharField(max_length=200, help_text="Description: ", required=False)
+    availability = forms.CharField(max_length=200, help_text="Availability: ", required=False)
+
 class UpdateConsumerForm(forms.Form):
     username = forms.CharField(max_length=200, help_text="Username: ", required=False)
     password = forms.CharField(max_length=200, help_text="Password: ", required=False)
@@ -39,7 +45,7 @@ class UpdateConsumerForm(forms.Form):
     last_name = forms.CharField(max_length=200, help_text="Last Name: ", required=False)
     phone = forms.CharField(max_length=15, help_text="Phone Number: ", required=False)
     email = forms.CharField(max_length=200, help_text="Email Address: ", required=False)
-    
+
     #class Meta:
         # Provide an association between the ModelForm and a model
         #   model = Consumer
@@ -67,7 +73,3 @@ class SearchConsumerForm(forms.Form):
 
 class SearchProducerForm(forms.Form):
     query = forms.CharField(max_length=200, help_text="Query: ")
-
-
-
-
