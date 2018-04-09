@@ -36,6 +36,14 @@ class CreateProducerForm(forms.Form):
     bio = forms.CharField(max_length=250, help_text="Bio: ")
     skills = forms.CharField(max_length=200, help_text="Skills: ")
 
+class UpdateConsumerRequestForm(forms.Form):
+    title = forms.CharField(max_length=200, help_text="Title: ", required=False)
+    offered_price = forms.FloatField(help_text="Offered Price: ", required=False)
+    description = forms.CharField(max_length=200, help_text="Description: ", required=False)
+    availability = forms.CharField(max_length=200, help_text="Availability: ", required=False)
+    consumer = forms.IntegerField(help_text="Consumer PK: ", required=False)
+    # authenticator = forms.CharField(max_length=256, help_text="Authenticator: ", required=False)
+
 class UpdateConsumerForm(forms.Form):
     username = forms.CharField(max_length=200, help_text="Username: ", required=False)
     password = forms.CharField(max_length=200, help_text="Password: ", required=False)
@@ -67,4 +75,3 @@ class SearchConsumerForm(forms.Form):
 
 class SearchProducerForm(forms.Form):
     query = forms.CharField(max_length=200, help_text="Query: ")
-
