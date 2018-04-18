@@ -7,8 +7,8 @@ services:
 
 before_install:
  - docker pull mysql:5.7.14
- - mkdir db
- - docker run --name mysql -d -e MYSQL\_ROOT\_PASSWORD='$3cureUS' -v db:/var/lib/mysql  mysql:5.7.14
+ - mkdir /home/travis/build/etkim97/CS4501-EMS/db
+ - docker run --name mysql -d -e MYSQL\_ROOT\_PASSWORD='$3cureUS' -v /home/travis/build/etkim97/CS4501-EMS/db:/var/lib/mysql  mysql:5.7.14
  - ls -la
  - pwd
  - docker run -it --name mysql-cmdline -v /home/travis/build/etkim97/CS4501-EMS/mysql_shell:/mysql_shell --link mysql:db mysql:5.7.14 bash -c "chmod +x /mysql_shell/mysql.sh && /mysql_shell/mysql.sh"
