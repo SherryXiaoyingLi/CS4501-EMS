@@ -9,7 +9,7 @@ before_install:
  - docker pull mysql:5.7.14
  - mkdir db
  - docker run --name mysql -d -e MYSQL\_ROOT\_PASSWORD='$3cureUS' -v db:/var/lib/mysql  mysql:5.7.14
- - docker run -it --name mysql-cmdline -v mysql.sh:/home/mysql.sh --link mysql:db mysql:5.7.14 bash -c "chmod +x /home/mysql.sh && /home/mysql.sh"
+ - docker run -it --name mysql-cmdline -v ./:/home --link mysql:db mysql:5.7.14 bash -c "chmod +x /home/mysql.sh && /home/mysql.sh"
  - docker-compose up -d
  - docker exec -it app_models_1 bash -c "python manage.py test"
  
