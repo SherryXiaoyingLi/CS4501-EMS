@@ -9,8 +9,7 @@ before_install:
  - docker pull mysql:5.7.14
  - mkdir /home/travis/build/etkim97/CS4501-EMS/db
  - docker run --name mysql -d -e MYSQL\_ROOT\_PASSWORD='$3cureUS' -v /home/travis/build/etkim97/CS4501-EMS/db:/var/lib/mysql  mysql:5.7.14
- - ls -la
- - pwd
+ - sleep 50
  - docker run -it --name mysql-cmdline -v /home/travis/build/etkim97/CS4501-EMS/mysql_shell:/mysql_shell --link mysql:db mysql:5.7.14 bash -c "chmod +x /mysql_shell/mysql.sh && /mysql_shell/mysql.sh"
  - docker-compose up -d
  - docker exec -it cs4501ems_models_1 bash -c "python manage.py test"
