@@ -12,5 +12,9 @@ before_install:
  - sleep 20
  - docker run -it --name mysql-cmdline -v /home/travis/build/etkim97/CS4501-EMS/mysql_shell:/mysql_shell --link mysql:db mysql:5.7.14 bash -c "chmod +x /mysql_shell/mysql.sh && /mysql_shell/mysql.sh"
  - docker-compose up -d
+
+install: true
+
+script:
  - docker exec -it cs4501ems_models_1 bash -c "python manage.py test"
  
