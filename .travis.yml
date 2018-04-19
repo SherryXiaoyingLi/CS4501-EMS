@@ -17,4 +17,5 @@ install: true
 
 script:
  - docker exec -it cs4501ems_models_1 bash -c "python manage.py test"
- 
+ - docker start selenium-test
+ - docker exec -it selenium-test bash -c "python selenium_test_script.py"
