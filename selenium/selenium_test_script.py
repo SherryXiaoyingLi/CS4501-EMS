@@ -50,7 +50,7 @@ class BasicWebTestCase(unittest.TestCase):
 
         # Checking that page is a request details page
         heading3 = driver.find_element_by_tag_name('h3')
-        self.assertEqual(heading3.text, "Request Details")
+        self.assertEquals(heading3.text, "Request Details")
 
         # Go back to home
         driver.find_element_by_link_text('Home').click()
@@ -60,7 +60,7 @@ class BasicWebTestCase(unittest.TestCase):
 
         # Checking that page is a request details page
         heading3 = driver.find_element_by_tag_name('h3')
-        self.assertEqual(heading3.text, "Request Details")
+        self.assertEquals(heading3.text, "Request Details")
 
     def tearDown(self):
         self.driver.close()
