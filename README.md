@@ -6,8 +6,9 @@
 
 # Project 6
 
-http://167.99.230.23:8000
-Deployed with Digital Ocean
+http://167.99.230.23
+
+Deployed with DigitalOcean.  Running with code from "digitalocean" branch.
 
 ## Models
 
