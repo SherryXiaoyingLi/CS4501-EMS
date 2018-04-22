@@ -32,6 +32,16 @@ web:
       - ./tech_consult_web:/app
     command: bash -c "mod_wsgi-express start-server --working-directory /app --reload-on-changes /app/tech_consult_web/wsgi.py"
 
+web2:
+    image: tp33/django
+    links:
+      - exp:exp-api
+    ports:
+      - "8004:8000"
+    volumes:
+      - ./tech_consult_web:/app
+    command: bash -c "mod_wsgi-express start-server --working-directory /app --reload-on-changes /app/tech_consult_web/wsgi.py"
+
 kafka:
    image: spotify/kafka
    container_name: kafka
@@ -55,3 +65,32 @@ batch:
    volumes:
       - ./batch:/app
    command: bash -c "python search_indexer.py"
+
+lb:
+   image: haproxy
+   container_name: haproxy
+   links:
+      - web
+      - web2
+   volumes:
+      - ./haproxy://usr/local/etc/haproxy
+   ports:
+      - '80:80'
+  
+selenium-chrome:
+  image: selenium/standalone-chrome
+  container_name: selenium-chrome
+  links:
+    - web:web
+  ports:
+    - "4444:4444"
+
+selenium-test:
+  image: tp33/django
+  container_name: selenium-test
+  links:
+    - selenium-chrome:selenium-chrome
+    - web:web
+  volumes:
+    - ./selenium:/app
+  command: bash -c "pip install selenium==3.11.0 && python loop.py"

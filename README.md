@@ -4,7 +4,10 @@
 * Marissa Lee (myl2vu) - Shardi3
 * Sherry Li (xl2gs) - LiXiaoying
 
-# Project 5
+# Project 6
+
+http://167.99.230.23:8000
+Deployed with Digital Ocean
 
 ## Models
 
