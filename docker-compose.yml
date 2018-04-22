@@ -26,8 +26,8 @@ web:
     image: tp33/django
     links:
       - exp:exp-api
-    ports:
-      - "8000:8000"
+    expose:
+      - "8000"
     volumes:
       - ./tech_consult_web:/app
     command: bash -c "mod_wsgi-express start-server --working-directory /app --reload-on-changes /app/tech_consult_web/wsgi.py"
@@ -36,8 +36,9 @@ web2:
     image: tp33/django
     links:
       - exp:exp-api
-    ports:
-      - "8004:8000"
+    expose:
+      - "8004"
+      - "8000"
     volumes:
       - ./tech_consult_web:/app
     command: bash -c "mod_wsgi-express start-server --working-directory /app --reload-on-changes /app/tech_consult_web/wsgi.py"
@@ -82,8 +83,8 @@ selenium-chrome:
   container_name: selenium-chrome
   links:
     - web:web
-  ports:
-    - "4444:4444"
+  expose:
+    - "4444"
 
 selenium-test:
   image: tp33/django
