@@ -784,6 +784,9 @@ class AuthenticatorTestCase(TestCase):
         # checks that response contains value with same pk as created
         self.assertFalse(response.json()['ok'])
 
+    def test_fail(self):
+        self.assertEquals("right", "wrong")
+
     # tearDown method is called after each test
     def tearDown(self):
         pass  # nothing to tear down
