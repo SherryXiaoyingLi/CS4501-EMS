@@ -143,13 +143,17 @@ Install PyMysql to Spark Containers (after docker-compose up)
 docker exec -it spark-worker bash -c "chmod +x /tmp/data/install_pymysql.sh && /tmp/data/install_pymysql.sh"
 
 docker exec -it spark-master bash -c "chmod +x /tmp/data/install_pymysql.sh && /tmp/data/install_pymysql.sh"
-
 ```
 
 Running Spark
 
 ```
-
 docker exec -it spark-master bin/spark-submit --master spark://spark-master:7077 --total-executor-cores 2 --executor-memory 512m /tmp/data/recommendation.py
 
+```
+
+Running Automated Spark
+
+```
+docker exec -it spark-master bash -c "chmod +x /tmp/data/automate-recommendation.sh && /tmp/data/automate-recommendation.sh"
 ```
