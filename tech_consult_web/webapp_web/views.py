@@ -86,6 +86,16 @@ def request_detail(request, consumerRequest_pk):
         context_dict['username'] = username
         context_dict['is_consumer'] = is_consumer
         context_dict['user_id'] = user_id
+        
+        # get recommendations for the current listing
+        req_recommendations = urllib.request.Request('http://exp-api:8000/api/v1/recommendations/' + str(consumerRequest_pk))
+        resp_json_recommendations = urllib.request.urlopen(req_recommendations).read().decode('utf-8')
+        results_recommendations = json.loads(resp_json_recommendations)
+            
+        if results_recommendations['ok']:
+                recommended_items = results_recommendations["result"]["recommendations"]
+                context_dict['recommendations'] = recommended_items
+       
         return render(request, "request_detail.html", context_dict)
 
     else:
@@ -848,3 +858,5 @@ def searchProducerResults(request):
         response = HttpResponseRedirect(reverse('web_search_producer_results'))
         messages.error(request, "Error with search.")
         return response
+
+
