@@ -38,5 +38,6 @@ urlpatterns = [
     url(r'^api/v1/search$', views.search, name='search'),
     url(r'^api/v1/searchConsumer$', views.searchConsumer, name='search_consumer'),
     url(r'^api/v1/searchProducer$', views.searchProducer, name='search_producer'),
+    url(r'^api/v1/recommendations/(?P<consumerRequest_pk>[0-9]+)$', views.get_recommendations, name='get_recommendations'),
     url(r'^api/v1/itemClick$', views.itemClick, name='item_click'),
 ]

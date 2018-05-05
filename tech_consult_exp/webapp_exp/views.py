@@ -777,6 +777,53 @@ def searchProducer(request):
     response["result"] = response_data
     return JsonResponse(response)
 
+# render recommendation details
+@csrf_exempt
+def get_recommendations (request, consumerRequest_pk) :
+    response = {}
+    response_data = {}
+
+    if request.method == 'GET' :
+        try:
+            req = urllib.request.Request('http://models-api:8000/api/v1/recommendations/'+ str(consumerRequest_pk))
+            resp_json = urllib.request.urlopen(req).read().decode('utf-8')
+            results = json.loads(resp_json)
+
+            if results['ok']:
+                recommended_items = results["result"]["recommended_items"]
+                recommended_data = []
+                for item_pk in recommended_items:
+                    req_item = urllib.request.Request('http://models-api:8000/api/v1/consumerRequests/' + str(item_pk))
+                    resp_json_item = urllib.request.urlopen(req_item).read().decode('utf-8')
+                    results_item = json.loads(resp_json_item)
+                    title = results_item['result']['title']
+                    description = results_item['result']['description']
+                    consumer_pk = results_item['result']['consumer']
+                    # get consumer name and id for recommended items
+                    req_username = urllib.request.Request('http://models-api:8000/api/v1/consumers/' + str(consumer_pk))
+                    resp_json_username = urllib.request.urlopen(req_username).read().decode('utf-8')
+                    results_username = json.loads(resp_json_username)
+                    consumerName = results_username['result']['username']
+                    data={'item_id':item_pk,'consumerName':consumerName, 'consumer':consumer_pk,'title':title, 'description':description}
+                    recommended_data.append(data)
+
+                item_id = results["result"]["item_id"]
+                response["ok"] = True
+                response_data["recommendations"] = recommended_data
+                response_data["item_id"] = item_id
+            else:
+                response["ok"] = False
+                response['msg'] = "Recommendations may not exist."
+        except:
+                response["ok"] = False
+                response['msg'] = "Error occurred at experience layer when getting recommendations."
+
+        response['result'] = response_data
+        return JsonResponse(response)
+    else:
+        response["ok"] = False
+        response['msg'] = "Error request method type, should be GET."
+        return JsonResponse(response)
 
 # make kafka producer on click
 @csrf_exempt
