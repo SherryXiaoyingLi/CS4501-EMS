@@ -4,7 +4,7 @@
 * Marissa Lee (myl2vu) - Shardi3
 * Sherry Li (xl2gs) - LiXiaoying
 
-# Project 6
+# Project 7
 
 http://167.99.230.23
 
@@ -51,6 +51,10 @@ Deployed with DigitalOcean.  Running with code from "digitalocean" branch.
 * authenticator (primary key)
 * date_created
 
+### Recommendation
+* item_id (foreign key of ConsumerRequest)
+* recommended_items (string)
+
 
 ## Microservices
 
@@ -86,6 +90,9 @@ All fields need to be entered for CREATE, but not UPDATE
 * 8001/api/v1/authenticators/create, post_data={user_id, is_consumer}
 * 8001/api/v1/authenticators/delete, post_data={authenticator}
 * 8001/api/v1/authenticators/validate, post_data={authenticator}
+
+### Recommendation
+* 8001/api/v1/recommendations/1
 
 ### Login
 * 8001/api/v1/login, post_data={username, password, user_id}
@@ -126,3 +133,23 @@ All fields need to be entered for CREATE, but not UPDATE
 * 8000/search_results
 * 8000/search_consumer_results
 * 8000/search_producer_results
+
+
+## Spark
+
+Install PyMysql to Spark Containers (after docker-compose up)
+
+```
+docker exec -it spark-worker bash -c "chmod +x /tmp/data/install_pymysql.sh && /tmp/data/install_pymysql.sh"
+
+docker exec -it spark-master bash -c "chmod +x /tmp/data/install_pymysql.sh && /tmp/data/install_pymysql.sh"
+
+```
+
+Running Spark
+
+```
+
+docker exec -it spark-master bin/spark-submit --master spark://spark-master:7077 --total-executor-cores 2 --executor-memory 512m /tmp/data/recommendation.py
+
+```
