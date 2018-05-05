@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.shortcuts import render_to_response
-from .forms import LoginForm
+from .forms import LoginForm, itemClickForm
 from .forms import EnterAuthenticatorForm, CreateConsumerRequestForm, CreateConsumerForm, CreateProducerForm, SearchForm, SearchConsumerForm, SearchProducerForm, UpdateConsumerRequestForm, UpdateConsumerForm, UpdateProducerForm
 from django.http import HttpResponse
 from django.http import JsonResponse
@@ -715,16 +715,16 @@ def searchConsumer(request):
  try:
     if request.method == 'POST':
         form = SearchConsumerForm(request.POST)
-        
+
         if form.is_valid():
             response["ok"] = True
             query = form.cleaned_data['query']
-            
+
             #Will call elastic search with query
             es = Elasticsearch(['es'])
             results = es.search(index='consumer_index', body={'query': {'query_string': {'query': query}}, 'size': 10})
             results = results['hits']['hits']
-            
+
             for r in results:
                 data = r['_source']
                 response_data.append(data)
@@ -733,7 +733,7 @@ def searchConsumer(request):
         else:
             response['ok'] = False
             response['msg'] = "Invalid data sent to search form in the experience layer."
-    
+
     else:
         form = SearchConsumerForm()
         return render(request, 'searchConsumer.html', {'form': form})
@@ -776,3 +776,29 @@ def searchProducer(request):
         response['msg'] = "Error with search in the experience layer"
     response["result"] = response_data
     return JsonResponse(response)
+
+
+# make kafka producer on click
+@csrf_exempt
+def itemClick(request):
+    try:
+        if request.method == 'POST':
+            form = itemClickForm(request.POST)
+
+            if form.is_valid():
+                # if request.method == 'POST':
+                user_id = form.cleaned_data['user_id']
+                item_id = form.cleaned_data['item_id']
+                #user_id=1
+                #item_id=1
+                type = 'access'
+                data = {'type':type,'user_id':user_id, 'item_id':item_id}
+                producer = KafkaProducer(bootstrap_servers=['kafka:9092'])
+                producer.send('kafka_topic', json.dumps(data).encode('utf-8'))
+                producer.close()
+        else:
+            form = itemClickForm()
+            return render(request, 'itemClick.html', {'form':form})
+    except:
+        return JsonResponse({"Error"})
+    return JsonResponse({})

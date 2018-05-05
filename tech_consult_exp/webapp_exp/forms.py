@@ -75,3 +75,7 @@ class SearchConsumerForm(forms.Form):
 
 class SearchProducerForm(forms.Form):
     query = forms.CharField(max_length=200, help_text="Query: ")
+
+class itemClickForm(forms.Form):
+    user_id = forms.IntegerField(help_text="User ID: ")
+    item_id = forms.IntegerField(help_text="Item ID: ")
