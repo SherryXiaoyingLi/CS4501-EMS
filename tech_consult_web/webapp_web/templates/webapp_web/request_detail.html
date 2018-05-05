@@ -42,10 +42,25 @@
         {% else %}
             <p>Accepted Consultant Username(if any):</p>
         {% endif %}
-    </h4>
-    {% else %}
+ {% else %}
         <h4>{{ msg }}</h4>
     {% endif %}
+
+
+	<h3><center><b>Recommended Items</b></center></h3>
+        <h4>
+	{% if recommendations %}
+        	{% for item in recommendations %}
+            		<a href="/request_detail/{{ item.item_id }}">{{item.title}}</a>, <a href="/consumer_detail/{{ item.consumer }}">{{ item.consumerName }}</a><br />
+            		<i>{{ item.description }}</i><br />
+            <br />
+                {% endfor %}
+	{% else %}
+            <p>No recommended items.</p>
+        {% endif %}
+	
+    </h4>
+   
     <br><a href="/">Home</a><br /></h4>
 </body>
 </html>
