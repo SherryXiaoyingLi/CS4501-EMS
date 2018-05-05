@@ -44,4 +44,5 @@ urlpatterns = [
     url(r'^api/v1/authenticators/delete$', views.delete_authenticator, name='delete_authenticator'),
     url(r'^api/v1/login$', views.login, name='login'),
     url(r'^api/v1/authenticators/validate$', views.validate, name='validate'),
+    url(r'^api/v1/recommendations/(?P<consumerRequest_pk>[0-9]+)$', views.get_recommendations, name='get_recommendations'),
 ]

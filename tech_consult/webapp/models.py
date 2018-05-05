@@ -56,3 +56,7 @@ class Authenticator(models.Model):
     user_id = models.IntegerField(default=0)
     is_consumer = models.BooleanField(default=True)
     date_created = models.CharField(max_length=50)
+
+class Recommendation(models.Model):
+    item_id = models.ForeignKey(ConsumerRequest, default=1)
+    recommended_items = models.CharField(max_length=100)

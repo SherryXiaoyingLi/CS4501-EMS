@@ -5,7 +5,7 @@ import json
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.contrib.auth.hashers import make_password, check_password
-from .models import Consumer, ConsumerRequest, Producer, Review, Authenticator
+from .models import Consumer, ConsumerRequest, Producer, Review, Authenticator, Recommendation
 from .forms import CreateConsumerForm, CreateProducerForm, CreateReviewForm, CreateConsumerRequestForm, CreateAuthenticatorForm, EnterAuthenticatorForm, LoginForm
 from .forms import UpdateConsumerForm, UpdateReviewForm, UpdateConsumerRequestForm, UpdateProducerForm
 from django.views.decorators.csrf import csrf_exempt
@@ -1031,4 +1031,28 @@ def validate(request):
         response['ok'] = False
 
     response['result'] = response_data
+    return JsonResponse(response)
+
+def get_recommendations (request, consumerRequest_pk):
+    response = {}
+    response_data = {}
+
+    if request.method == 'GET':
+        try:
+            recommendation = Recommendation.objects.get(item_id=consumerRequest_pk)
+
+            response['ok'] = True
+
+            response_data['item_id'] = recommendation.item_id.pk
+
+            # Converting recommended items from string to list of item_ids
+            recommended_items = recommendation.recommended_items.split(',')
+            recommended_items = list(map(int, recommended_items))
+            response_data['recommended_items'] = recommended_items
+
+        except:
+            response['ok'] = False
+
+        response['result'] = response_data
+
     return JsonResponse(response)
