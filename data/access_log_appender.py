@@ -24,5 +24,5 @@ for message in consumer:
         logging.basicConfig(filename=log, filemode='a', format='%(message)s',level=logging.INFO)
         logging.info('This is a test')
         '''
-        with open('output.txt', 'a') as the_file:
+        with open('access.txt', 'a') as the_file:
             the_file.write(str(user_id) + '\t' + str(item_id) + '\n')

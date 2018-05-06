@@ -115,6 +115,8 @@ All fields need to be entered for CREATE, but not UPDATE
 * 8002/api/v1/search, post_data={query}
 * 8002/api/v1/searchConsumer, post_data={query}
 * 8002/api/v1/searchProducer, post_data={query}
+* 8002/api/v1/recommendations/1
+* 8002/api/v1/itemClick, post_data={user_id, item_id}
 
 ## Web
 
@@ -137,7 +139,8 @@ All fields need to be entered for CREATE, but not UPDATE
 
 ## Spark
 
-Install PyMysql to Spark Containers (after docker-compose up)
+### Install PyMysql to Spark Containers (after docker-compose up)
+The following commands will install mysqldb to the two Spark containers.
 
 ```
 docker exec -it spark-worker bash -c "chmod +x /tmp/data/install_pymysql.sh && /tmp/data/install_pymysql.sh"
@@ -145,15 +148,18 @@ docker exec -it spark-worker bash -c "chmod +x /tmp/data/install_pymysql.sh && /
 docker exec -it spark-master bash -c "chmod +x /tmp/data/install_pymysql.sh && /tmp/data/install_pymysql.sh"
 ```
 
-Running Spark
+### Running Spark File recommendation.py
+The following command will run the Spark job.
 
 ```
 docker exec -it spark-master bin/spark-submit --master spark://spark-master:7077 --total-executor-cores 2 --executor-memory 512m /tmp/data/recommendation.py
-
 ```
 
-Running Automated Spark
+### Running Automated Spark
+The following commands will install mysqldb and the automated Spark job.
 
 ```
+docker exec -it spark-worker bash -c "chmod +x /tmp/data/install_pymysql.sh && /tmp/data/install_pymysql.sh"
+
 docker exec -it spark-master bash -c "chmod +x /tmp/data/automate-recommendation.sh && /tmp/data/automate-recommendation.sh"
 ```
