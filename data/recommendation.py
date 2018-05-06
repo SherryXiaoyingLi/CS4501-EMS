@@ -49,7 +49,7 @@ except:
 sc = SparkContext("spark://spark-master:7077", "PopularItems")
 
 # 1. Read data in as pairs of (user_id, item_id clicked on by the user)
-data = sc.textFile("/tmp/data/access.log", 2)     # each worker loads a piece of the data file
+data = sc.textFile("/tmp/data/access.txt", 2)     # each worker loads a piece of the data file
 
 pages = data.map(lambda line: line.split("\t"))   # tell each worker to split each line of it's partition
 
