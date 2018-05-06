@@ -156,10 +156,8 @@ docker exec -it spark-master bin/spark-submit --master spark://spark-master:7077
 ```
 
 ### Running Automated Spark
-The following commands will install mysqldb and the automated Spark job.
+The following command will install mysqldb and run the automated Spark job.
 
 ```
-docker exec -it spark-worker bash -c "chmod +x /tmp/data/install_pymysql.sh && /tmp/data/install_pymysql.sh"
-
-docker exec -it spark-master bash -c "chmod +x /tmp/data/automate-recommendation.sh && /tmp/data/automate-recommendation.sh"
+data/run_spark_job.sh
 ```
