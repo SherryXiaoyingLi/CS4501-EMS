@@ -6,7 +6,7 @@ import logging
 time.sleep(15)
 
 #Reads from the log added by the request_detail service of the experience layer
-consumer = KafkaConsumer('kafka_topic', group_id='indexer', bootstrap_servers=['kafka:9092'])
+consumer = KafkaConsumer('spark_topic', group_id='indexer', bootstrap_servers=['kafka:9092'])
 
 for message in consumer:
 
