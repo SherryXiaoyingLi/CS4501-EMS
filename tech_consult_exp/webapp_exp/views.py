@@ -841,7 +841,7 @@ def itemClick(request):
                 type = 'access'
                 data = {'type':type,'user_id':user_id, 'item_id':item_id}
                 producer = KafkaProducer(bootstrap_servers=['kafka:9092'])
-                producer.send('kafka_topic', json.dumps(data).encode('utf-8'))
+                producer.send('spark_topic', json.dumps(data).encode('utf-8'))
                 producer.close()
         else:
             form = itemClickForm()
