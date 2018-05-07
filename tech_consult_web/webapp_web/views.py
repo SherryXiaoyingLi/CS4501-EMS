@@ -72,9 +72,10 @@ def request_detail(request, consumerRequest_pk):
     post_encoded = urllib.parse.urlencode(post_data).encode('utf-8')
 
     # To do: implement django form and post in exp layer
-    req2 = urllib.request.Request('http://exp-api:8000/api/v1/itemClick', data=post_encoded,method='POST')
-    resp_json2 = urllib.request.urlopen(req2).read().decode('utf-8')
-    resp2 = json.loads(resp_json2)
+    if logged_in and not is_consumer:
+        req2 = urllib.request.Request('http://exp-api:8000/api/v1/itemClick', data=post_encoded,method='POST')
+        resp_json2 = urllib.request.urlopen(req2).read().decode('utf-8')
+        resp2 = json.loads(resp_json2)
 
     if resp['ok']:
         context_dict['ok'] = True
