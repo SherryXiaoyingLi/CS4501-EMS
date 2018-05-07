@@ -68,6 +68,14 @@ def request_detail(request, consumerRequest_pk):
     resp = json.loads(resp_json)
     print(resp)
 
+    post_data = {'user_id':user_id, 'item_id':consumerRequest_pk}
+    post_encoded = urllib.parse.urlencode(post_data).encode('utf-8')
+
+    # To do: implement django form and post in exp layer
+    req2 = urllib.request.Request('http://exp-api:8000/api/v1/itemClick', data=post_encoded,method='POST')
+    resp_json2 = urllib.request.urlopen(req2).read().decode('utf-8')
+    resp2 = json.loads(resp_json2)
+
     if resp['ok']:
         context_dict['ok'] = True
         context_dict['title'] = resp['result']['title']
@@ -86,16 +94,16 @@ def request_detail(request, consumerRequest_pk):
         context_dict['username'] = username
         context_dict['is_consumer'] = is_consumer
         context_dict['user_id'] = user_id
-        
+
         # get recommendations for the current listing
         req_recommendations = urllib.request.Request('http://exp-api:8000/api/v1/recommendations/' + str(consumerRequest_pk))
         resp_json_recommendations = urllib.request.urlopen(req_recommendations).read().decode('utf-8')
         results_recommendations = json.loads(resp_json_recommendations)
-            
+
         if results_recommendations['ok']:
                 recommended_items = results_recommendations["result"]["recommendations"]
                 context_dict['recommendations'] = recommended_items
-       
+
         return render(request, "request_detail.html", context_dict)
 
     else:
@@ -842,7 +850,7 @@ def searchProducerResults(request):
                     results = resp['result']
                     #results = [{'title': 'Help with docker', 'description': 'Looking for someone with experience', 'consumer_username': 'mylee3', 'consumer_pk': 1, 'timestamp': 'April 2, 2018', 'pk':1}]
                     return render(request, 'searchProducer_results.html', {'form': form, 'is_consumer':is_consumer, 'user_id':user_id, 'username': username, 'logged_in': logged_in, 'query': query, 'results': results})
-                
+
                 else:
                     response = HttpResponseRedirect(reverse('web_search_producer_results'))
                     #messages.error(request, resp['msg'])
@@ -858,5 +866,3 @@ def searchProducerResults(request):
         response = HttpResponseRedirect(reverse('web_search_producer_results'))
         messages.error(request, "Error with search.")
         return response
-
-
