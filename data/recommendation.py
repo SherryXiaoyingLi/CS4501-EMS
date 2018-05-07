@@ -75,13 +75,12 @@ def f (xs):
     return retList
 
 #3. Transform into (user_id, (item1, item2) where item1 and item2 are pairs of items the user clicked on
-user_click_pairs = clicks.flatMapValues(lambda xs: [(xs[x], xs[x+1]) for x in range(0, len(xs)-1)]).distinct()
-# Not counting pairs of (item1, item1)
-user_click_pairs = user_click_pairs.filter(lambda x: x[1][0] != x[1][1])
-#user_click_pairs = clicks.flatMapValues(f)
-#user_click_pairs = user_click_pairs.map(lambda x: [x[0], tuple(list(x[1]).sort)])
+user_click_pairs = clicks.flatMapValues(lambda xs: [(xs[x], xs[x+1]) for x in range(0, len(xs)-1)])
 
-#To Do: Find way to sort the values inside the tuple to allow double-sided
+#Sorting pairs for 2-way recommendations
+user_click_pairs = user_click_pairs.map(lambda pair: (pair[0], tuple(sorted(list(pair[1])))))
+# Not counting pairs of (item1, item1)
+user_click_pairs = user_click_pairs.filter(lambda x: x[1][0] != x[1][1]).distinct()
 
 output = user_click_pairs.collect()
 for user_id, pair in output:
@@ -146,10 +145,10 @@ for item_pair, count in output:
             recommended_items = ', '.join(str(x) for x in recommended_items)
             sql = "UPDATE webapp_recommendation SET recommended_items = '%s' WHERE item_id_id='%d'" % (recommended_items, item1)
             cursor.execute(sql)
-            #db.commit()
+    db.commit()
 
     #Repeat for item2 once we get the double-sided to work
-    '''
+
     sql = "SELECT * FROM webapp_recommendation WHERE item_id_id='%d'" % (item2)
     cursor.execute(sql)
 
@@ -159,7 +158,7 @@ for item_pair, count in output:
         # No record so insert
         sql = "INSERT INTO webapp_recommendation(item_id_id, recommended_items) \
                   VALUES ('%d', '%s' )" % \
-              (item1, str(item1))
+              (item2, str(item1))
         cursor.execute(sql)
         #db.commit()
 
@@ -171,13 +170,13 @@ for item_pair, count in output:
         recommended_items = list(map(int, recommended_items))
 
         # Only update if item not already in list
-        if (item2 not in recommended_items):
+        if (item1 not in recommended_items):
             recommended_items.append(item1)
             recommended_items = ', '.join(str(x) for x in recommended_items)
             sql = "UPDATE webapp_recommendation SET recommended_items = '%s' WHERE item_id_id='%d'" % (
             recommended_items, item2)
             cursor.execute(sql)
-    '''
+
     db.commit()
 
 print ("5. Transform into ((item1, item2), count of distinct users who co-clicked (item1, item2)")
